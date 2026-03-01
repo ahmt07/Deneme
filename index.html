@@ -1,1376 +1,169 @@
-<!doctype html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8">
-  <title>Ahmet Tekeli Erkek Kuaförü • Online Randevu</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#020617;
-      --card:#ffffff;
-      --muted-bg:#f1f5f9;
-      --ink:#0f172a;
-      --muted:#6b7280;
-      --line:#e2e8f0;
-      --brand:#22c55e;
-      --brand-dark:#16a34a;
-      --gold:#d4af37;
-      --danger:#ef4444;
-      --ok:#22c55e;
-      --tab-bg:#020617;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{
-      font:15px/1.55 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-      background:var(--bg);
-      color:var(--ink);
-    }
-
-    body{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .app{
-      width:100%;
-      max-width:420px;
-      height:100vh;
-      max-height:900px;
-      background:#f3f4f6;
-      border-radius:32px;
-      overflow:hidden;
-      position:relative;
-      box-shadow:0 20px 60px rgba(0,0,0,.45);
-    }
-
-    header.app-header{
-      position:relative;
-      padding:18px 18px 12px;
-      background:linear-gradient(to bottom,#000,#020617);
-      color:#f9fafb;
-    }
-
-    .status-notch{
-      position:absolute;
-      inset:12px 25% auto 25%;
-      height:22px;
-      background:#000;
-      border-radius:12px;
-    }
-
-    .screen{
-      display:none;
-      height:calc(100% - 120px);
-      overflow-y:auto;
-      padding:0 0 70px;
-      background:#f3f4f6;
-    }
-    .screen.active{display:block;}
-
-    .welcome-logo{
-      text-align:center;
-      padding:60px 24px 24px;
-      background:#000;
-      color:#f9fafb;
-    }
-    .welcome-logo-circle{
-      width:150px;height:150px;
-      border-radius:999px;
-      border:2px solid var(--gold);
-      margin:0 auto 16px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family:"Playfair Display",serif;
-      font-size:26px;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-    }
-    .welcome-logo span{
-      font-size:12px;
-      color:#e5e7eb;
-      letter-spacing:.18em;
-    }
-
-    .screen-inner{
-      padding:20px 18px 24px;
-    }
-
-    .btn{
-      display:block;
-      width:100%;
-      border-radius:999px;
-      padding:12px 18px;
-      font-size:15px;
-      font-weight:600;
-      border:none;
-      cursor:pointer;
-      text-align:center;
-      transition:.16s ease;
-    }
-    .btn-primary{
-      background:var(--brand);
-      color:#f9fafb;
-      box-shadow:0 10px 22px rgba(16,185,129,.35);
-    }
-    .btn-primary:hover{background:var(--brand-dark);}
-    .btn-outline{
-      background:transparent;
-      color:#f9fafb;
-      border:1px solid #4b5563;
-    }
-    .btn-secondary{
-      background:#e5e7eb;
-      color:#111827;
-    }
-    .btn-danger{
-      background:var(--danger);
-      color:#f9fafb;
-    }
-    .btn-sm{
-      padding:8px 14px;
-      font-size:13px;
-      border-radius:999px;
-    }
-
-    .mt-8{margin-top:8px}
-    .mt-12{margin-top:12px}
-    .mt-16{margin-top:16px}
-    .mt-20{margin-top:20px}
-    .mt-24{margin-top:24px}
-
-    .text-center{text-align:center}
-    .text-muted{color:var(--muted)}
-    .text-sm{font-size:13px}
-    .fw-600{font-weight:600}
-    .fw-700{font-weight:700}
-
-    .field{
-      margin-top:12px;
-    }
-    .field label{
-      display:block;
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:4px;
-    }
-    .field input,
-    .field textarea{
-      width:100%;
-      border-radius:12px;
-      border:1px solid var(--line);
-      padding:10px 12px;
-      font:inherit;
-      background:#fff;
-    }
-    .field textarea{resize:vertical;min-height:70px;}
-
-    .hero-card{
-      margin-top:10px;
-      background:#d1fae5;
-      border-radius:18px;
-      padding:16px 14px;
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .hero-illus{
-      width:90px;height:72px;
-      border-radius:14px;
-      background:linear-gradient(135deg,#22c55e,#a7f3d0);
-      position:relative;
-      overflow:hidden;
-    }
-    .hero-illus::before,
-    .hero-illus::after{
-      content:"";
-      position:absolute;
-      border-radius:999px;
-      border:2px solid rgba(255,255,255,.5);
-    }
-    .hero-illus::before{
-      width:70px;height:70px;
-      left:-10px;bottom:-4px;
-    }
-    .hero-illus::after{
-      width:50px;height:50px;
-      right:-12px;top:-8px;
-    }
-
-    .section-title{
-      margin-top:18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      font-weight:600;
-    }
-    .section-title a{
-      font-size:13px;
-      color:#16a34a;
-      text-decoration:none;
-    }
-
-    .pill-row{
-      display:flex;
-      gap:12px;
-      margin-top:10px;
-    }
-    .pill{
-      flex:1;
-      background:#fff;
-      border-radius:16px;
-      padding:10px;
-      text-align:center;
-      border:1px solid #e5e7eb;
-      box-shadow:0 1px 2px rgba(15,23,42,.05);
-      font-size:13px;
-    }
-    .pill-icon{
-      font-size:20px;
-      margin-bottom:4px;
-    }
-
-    .barber-row{
-      display:flex;
-      gap:10px;
-      margin-top:10px;
-      overflow-x:auto;
-      padding-bottom:4px;
-    }
-    .barber-card{
-      min-width:130px;
-      background:#fff;
-      border-radius:16px;
-      padding:10px;
-      border:1px solid #e5e7eb;
-      box-shadow:0 1px 3px rgba(15,23,42,.08);
-      cursor:pointer;
-      transition:.14s ease;
-    }
-    .barber-card:hover{
-      transform:translateY(-1px);
-      box-shadow:0 6px 16px rgba(15,23,42,.18);
-    }
-    .barber-card.selected{
-      border-color:var(--brand);
-      box-shadow:0 0 0 2px rgba(34,197,94,.35);
-    }
-    .barber-avatar{
-      width:42px;height:42px;
-      border-radius:999px;
-      background:#e5e7eb;
-      margin-bottom:6px;
-    }
-    .barber-name{font-size:14px;font-weight:600;}
-    .barber-age{font-size:12px;color:var(--muted);}
-
-    .home-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .home-header-user{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .home-avatar{
-      width:36px;height:36px;border-radius:999px;
-      background:#e5e7eb;
-    }
-    .home-header-actions{
-      display:flex;gap:8px;
-    }
-    .icon-btn{
-      width:30px;height:30px;border-radius:999px;
-      border:none;background:#e5e7eb;
-      display:flex;align-items:center;justify-content:center;
-      font-size:16px;cursor:pointer;
-    }
-
-    .divider{
-      height:1px;margin:16px 0;background:#e5e7eb;
-    }
-
-    /* Booking screens */
-    .back-row{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:14px;
-      padding:12px 18px;
-      background:#e5e7eb;
-    }
-    .back-row button{
-      border:none;background:none;font-size:18px;cursor:pointer;
-    }
-
-    .subscreen-header{
-      padding:14px 18px 8px;
-      font-weight:600;
-      font-size:16px;
-    }
-
-    .service-cat{
-      margin:8px 18px;
-      margin-bottom:4px;
-      font-weight:600;
-      font-size:14px;
-    }
-    .service-list{
-      margin:0 18px 12px;
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid #e5e7eb;
-      background:#fff;
-    }
-    .service-item{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:8px 10px;
-      border-top:1px solid #e5e7eb;
-      cursor:pointer;
-      font-size:14px;
-    }
-    .service-item:first-child{border-top:none;}
-    .service-item.active{
-      background:#dcfce7;
-    }
-    .service-item span.meta{
-      font-size:13px;color:var(--muted);
-    }
-
-    .selected-services{
-      margin:10px 18px 0;
-      background:#ecfeff;
-      border-radius:14px;
-      padding:10px 12px;
-      font-size:13px;
-      border:1px solid #bae6fd;
-    }
-
-    .summary-box{
-      margin:12px 18px;
-      border-radius:18px;
-      background:#fff;
-      border:1px solid #e5e7eb;
-      padding:12px 12px;
-      font-size:13px;
-    }
-    .summary-row{
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:4px;
-    }
-    .summary-row strong{font-weight:600;}
-    .summary-label{color:var(--muted);}
-
-    .summary-services ul{
-      margin-left:16px;
-      margin-top:4px;
-    }
-
-    .badge{
-      display:inline-flex;align-items:center;
-      border-radius:999px;
-      padding:2px 8px;
-      font-size:11px;
-      background:#e5e7eb;
-    }
-
-    .time-grid{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin:10px 18px 16px;
-    }
-    .time-slot{
-      min-width:68px;
-      padding:6px 4px;
-      border-radius:999px;
-      font-size:13px;
-      text-align:center;
-      border:1px solid #e5e7eb;
-      background:#fff;
-      cursor:pointer;
-    }
-    .time-slot.free{background:#dcfce7;border-color:#86efac;}
-    .time-slot.busy{background:#fee2e2;border-color:#fecaca;color:#991b1b;cursor:not-allowed;}
-    .time-slot.selected{background:#16a34a;border-color:#15803d;color:#f9fafb;}
-
-    .note-card{
-      margin:10px 18px;
-      background:#fff;
-      border-radius:16px;
-      padding:10px 12px;
-      border:1px solid #e5e7eb;
-    }
-
-    /* Reservations list */
-    .res-list{
-      padding:10px 18px 24px;
-    }
-    .res-card{
-      background:#fff;
-      border-radius:18px;
-      padding:12px 12px 10px;
-      margin-bottom:12px;
-      box-shadow:0 1px 3px rgba(15,23,42,.12);
-      border:1px solid #e5e7eb;
-      position:relative;
-    }
-    .res-pill-num{
-      position:absolute;
-      left:10px;top:10px;
-      font-size:11px;
-      background:#bbf7d0;
-      color:#166534;
-      padding:2px 7px;
-      border-radius:999px;
-      font-weight:600;
-    }
-    .res-delete{
-      position:absolute;
-      right:10px;top:10px;
-    }
-    .res-title{
-      margin-top:18px;
-      font-weight:600;
-      font-size:14px;
-    }
-    .res-date{
-      font-size:13px;color:var(--muted);
-    }
-    .res-more{
-      margin-top:6px;
-      font-size:13px;
-      color:#22c55e;
-    }
-
-    /* Profile */
-    .profile-wrap{
-      padding:16px 18px 80px;
-    }
-    .profile-header{
-      font-weight:600;
-      font-size:16px;
-      margin-bottom:8px;
-    }
-
-    /* About */
-    .about-img{
-      width:100%;border-radius:18px;
-      height:190px;
-      object-fit:cover;
-      background:#111827;
-      margin-bottom:10px;
-    }
-    .about-icons{
-      display:flex;gap:10px;margin-bottom:12px;
-    }
-    .about-icon{
-      flex:1;
-      border-radius:14px;
-      padding:10px;
-      background:#e5e7eb;
-      text-align:center;
-      font-size:13px;
-    }
-
-    /* Tabs */
-    .tabbar{
-      position:absolute;
-      left:0;right:0;bottom:0;
-      height:64px;
-      background:var(--tab-bg);
-      display:flex;
-      align-items:center;
-      justify-content:space-around;
-      padding:6px 10px 10px;
-    }
-    .tab-btn{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:2px;
-      color:#9ca3af;
-      font-size:11px;
-      cursor:pointer;
-    }
-    .tab-btn span.icon{
-      width:24px;height:24px;
-      border-radius:999px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:15px;
-      background:#020617;
-    }
-    .tab-btn.active{
-      color:var(--brand);
-    }
-    .tab-btn.active span.icon{
-      border:1px solid var(--brand);
-    }
-
-    /* Toast */
-    .toast{
-      position:absolute;
-      left:50%;bottom:78px;
-      transform:translateX(-50%) translateY(120%);
-      background:#16a34a;
-      color:#f9fafb;
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:13px;
-      box-shadow:0 10px 30px rgba(22,163,74,.5);
-      opacity:0;
-      transition:.24s ease;
-      z-index:20;
-    }
-    .toast.show{
-      opacity:1;
-      transform:translateX(-50%) translateY(0);
-    }
-
-    /* Small helpers */
-    .tagline{font-size:13px;color:#e5e7eb;margin-top:6px;}
-    .welcome-buttons{padding:18px;}
-  </style>
-</head>
-<body>
-<div class="app" id="app">
-
-  <!-- Top header (just visual) -->
-  <header class="app-header">
-    <div class="status-notch"></div>
-  </header>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
-
-  <!-- WELCOME / AUTH -->
-  <section class="screen active" id="screen-welcome">
-    <div class="welcome-logo">
-      <div class="welcome-logo-circle">
-        AT
-      </div>
-      <h1 style="font-family:'Playfair Display',serif;font-size:22px;">Ahmet Tekeli</h1>
-      <div class="tagline">ERKEK KUAFÖRÜ • BALIKESİR</div>
-    </div>
-    <div class="welcome-buttons">
-      <p class="text-center text-muted mt-8">Hoş geldiniz! Online randevu sistemimize giriş yapın veya kayıt olmadan devam edin.</p>
-      <button class="btn btn-primary mt-20" onclick="showAuthForm()">Giriş Yap / Kayıt Ol</button>
-      <button class="btn btn-secondary mt-8" onclick="continueAsGuest()">Kayıt Olmadan Devam Et</button>
-
-      <div class="mt-20 text-center text-sm text-muted">
-        Devam ederek <u>Şartlarımızı</u> ve <u>Gizlilik Politikamızı</u> kabul etmiş olursunuz.
-      </div>
-
-      <div id="auth-form" class="mt-20" style="display:none;">
-        <div class="field">
-          <label>Ad Soyad</label>
-          <input id="auth-name" placeholder="Örn: Ahmet Tekeli">
-        </div>
-        <div class="field">
-          <label>Yaş</label>
-          <input id="auth-age" type="number" min="10" max="99" placeholder="Örn: 32">
-        </div>
-        <div class="field">
-          <label>Telefon</label>
-          <input id="auth-phone" placeholder="5XXXXXXXXX">
-        </div>
-        <button class="btn btn-primary mt-16" onclick="saveUser()">Kaydet ve Devam Et</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOME -->
-  <section class="screen" id="screen-home">
-    <div class="screen-inner">
-      <div class="home-header">
-        <div class="home-header-user">
-          <div class="home-avatar"></div>
-          <div>
-            <div class="text-sm text-muted">Merhaba 👋</div>
-            <div class="fw-600" id="home-username">Misafir</div>
-          </div>
-        </div>
-        <div class="home-header-actions">
-          <button class="icon-btn" onclick="openAbout()" title="Hakkımızda">i</button>
-          <button class="icon-btn" onclick="openNotifications()" title="Bildirimler">🔔</button>
-        </div>
-      </div>
-
-      <div class="hero-card">
-        <div class="hero-illus"></div>
-        <div>
-          <div class="fw-600">Ahmet Tekeli Erkek Kuaförü</div>
-          <div class="text-sm text-muted mt-4">Online randevunu oluştur, beklemeden koltuğa otur.</div>
-        </div>
-      </div>
-
-      <div class="section-title">
-        <span>Hizmetler</span>
-        <a href="#" onclick="openServicesList();return false;">Hepsini Gör</a>
-      </div>
-      <div class="pill-row">
-        <div class="pill">
-          <div class="pill-icon">💇‍♂️</div>
-          Saç Tıraşı
-        </div>
-        <div class="pill">
-          <div class="pill-icon">🧔</div>
-          Sakal Tıraşı
-        </div>
-        <div class="pill">
-          <div class="pill-icon">💇‍♂️🧔</div>
-          Saç & Sakal
-        </div>
-      </div>
-
-      <div class="section-title mt-16">
-        <span>Berberler</span>
-        <a href="#" onclick="openBarberList();return false;">Hepsini Gör</a>
-      </div>
-      <div class="barber-row" id="home-barber-row">
-        <!-- JS dolduracak -->
-      </div>
-
-      <button class="btn btn-primary mt-24" onclick="startReservation()">REZERVASYON YAP</button>
-
-      <div class="divider"></div>
-
-      <div class="section-title">
-        <span>Hakkımızda</span>
-        <a href="#" onclick="openAbout();return false;">Detaylar</a>
-      </div>
-      <p class="mt-8 text-sm text-muted">
-        Balıkesir’de modern kesim, sakal ve bakım hizmetlerini bir arada sunan Ahmet Tekeli Erkek Kuaförü; hijyen, kalite ve samimiyeti aynı çatı altında toplar.
-      </p>
-    </div>
-  </section>
-
-  <!-- BOOK: BARBER -->
-  <section class="screen" id="screen-book-barber">
-    <div class="back-row">
-      <button onclick="goHome()">‹</button>
-      <span>Geri Dön</span>
-    </div>
-    <div class="subscreen-header">Berber Seçimi</div>
-    <div class="screen-inner" id="book-barber-list">
-      <!-- JS dolduracak -->
-    </div>
-  </section>
-
-  <!-- BOOK: SERVICES -->
-  <section class="screen" id="screen-book-services">
-    <div class="back-row">
-      <button onclick="backToBarber()">‹</button>
-      <span>Geri Dön</span>
-    </div>
-    <div class="subscreen-header" id="book-services-title">Hizmet Seçimi</div>
-
-    <div id="service-category-blocks">
-      <!-- Kategoriler + hizmet listeleri JS ile -->
-    </div>
-
-    <div class="selected-services" id="selected-services-box">
-      Henüz hizmet seçmediniz.
-    </div>
-
-    <div class="summary-box">
-      <div class="summary-row"><span class="summary-label">Toplam Hizmet</span><strong id="sum-count">0 adet</strong></div>
-      <div class="summary-row"><span class="summary-label">Toplam Süre</span><strong id="sum-duration">0 dk</strong></div>
-      <div class="summary-row"><span class="summary-label">Toplam Ücret</span><strong id="sum-price">0 ₺</strong></div>
-    </div>
-
-    <div style="padding:0 18px 20px;">
-      <button class="btn btn-primary" onclick="goToDateTime()">Devam Et</button>
-    </div>
-  </section>
-
-  <!-- BOOK: DATE & TIME -->
-  <section class="screen" id="screen-book-datetime">
-    <div class="back-row">
-      <button onclick="backToServices()">‹</button>
-      <span>Geri Dön</span>
-    </div>
-
-    <div class="subscreen-header">Randevu Tarihi ve Saati Seçimi</div>
-
-    <div class="summary-box">
-      <div class="summary-row">
-        <span class="summary-label">Berber:</span>
-        <strong id="summary-barber"></strong>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">Müşteri:</span>
-        <strong id="summary-customer"></strong>
-      </div>
-
-      <div class="divider" style="margin:8px 0;"></div>
-
-      <div class="summary-row">
-        <span class="summary-label">Toplam Hizmet:</span>
-        <strong id="summary-count"></strong>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">Toplam Süre:</span>
-        <strong id="summary-duration"></strong>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">Toplam Ücret:</span>
-        <strong id="summary-price"></strong>
-      </div>
-
-      <div class="summary-services mt-8">
-        <div class="summary-label">Seçilen Hizmetler:</div>
-        <ul id="summary-services-list"></ul>
-      </div>
-
-      <div class="divider" style="margin:10px 0;"></div>
-
-      <div class="summary-row">
-        <span class="summary-label">Tarih:</span>
-        <strong id="summary-date">-</strong>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">Saat:</span>
-        <strong id="summary-time">-</strong>
-      </div>
-    </div>
-
-    <div class="note-card">
-      <div class="text-sm fw-600">Notunuz (opsiyonel)</div>
-      <textarea id="note-input" placeholder="Buraya notunuzu yazabilirsiniz..."></textarea>
-    </div>
-
-    <div class="summary-box" style="background:#e0f2fe;">
-      <div class="text-sm fw-600">Tarih Seç:</div>
-      <input type="date" id="date-input" class="mt-8" style="width:100%;border-radius:10px;border:1px solid #bfdbfe;padding:8px 10px;font:inherit;">
-    </div>
-
-    <div class="summary-box" style="margin-top:10px;">
-      <div class="text-sm fw-600">Saat Seçimi <span class="text-sm text-muted">(15 dk aralıklarla)</span></div>
-      <div class="time-grid" id="time-grid">
-        <!-- JS saatleri doldurur -->
-      </div>
-    </div>
-
-    <div style="padding:0 18px 20px;">
-      <button class="btn btn-primary" onclick="confirmReservation()">Randevuyu Onayla</button>
-    </div>
-  </section>
-
-  <!-- RESERVATIONS LIST -->
-  <section class="screen" id="screen-reservations">
-    <div class="subscreen-header">Rezervasyonlarınız</div>
-    <div class="res-list" id="res-list">
-      <!-- JS kartları ekler -->
-    </div>
-  </section>
-
-  <!-- PROFILE -->
-  <section class="screen" id="screen-profile">
-    <div class="profile-wrap">
-      <div class="profile-header">Profil</div>
-
-      <div class="field">
-        <label>Ad Soyad</label>
-        <input id="profile-name">
-      </div>
-      <div class="field">
-        <label>Yaş</label>
-        <input id="profile-age" type="number">
-      </div>
-      <div class="field">
-        <label>Telefon</label>
-        <input id="profile-phone">
-      </div>
-
-      <button class="btn btn-primary mt-16" onclick="saveProfile()">Profili Kaydet</button>
-      <button class="btn btn-danger mt-16" onclick="deleteAccount()">Hesabı Sil</button>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section class="screen" id="screen-about">
-    <div class="back-row">
-      <button onclick="goHome()">‹</button>
-      <span>Geri Dön</span>
-    </div>
-    <div class="screen-inner">
-      <img class="about-img" src="" alt="Salon Fotoğrafı (buraya kendi görselini koyabilirsin)">
-      <div class="about-icons">
-        <div class="about-icon">ℹ️<br>Bilgi</div>
-        <div class="about-icon">📍<br>Konum</div>
-        <div class="about-icon">📞<br>Telefon</div>
-        <div class="about-icon">🧭<br>Yol Tarifi</div>
-      </div>
-      <h2 style="font-size:17px;margin-bottom:6px;">Hakkımızda</h2>
-      <p class="text-sm" style="color:var(--muted);">
-        Ahmet Tekeli Erkek Kuaförü, Balıkesir'de modern saç kesimi, sakal tıraşı ve kişisel bakım hizmetleri sunan bir erkek bakım merkezidir.
-        Hijyen, profesyonellik ve samimiyeti ilke edinmiş ekibimizle her müşterimizin kendini özel hissetmesi için çalışıyoruz.
-      </p>
-      <p class="text-sm mt-12" style="color:var(--muted);">
-        Salonumuzda randevu sistemiyle çalışarak bekleme sürelerini minimuma indiriyor, size ayrılan zamanda sadece sizinle ilgileniyoruz.
-      </p>
-    </div>
-  </section>
-
-  <!-- NOTIFICATIONS (BASİT) -->
-  <section class="screen" id="screen-notifications">
-    <div class="subscreen-header">Bildirimler</div>
-    <div class="screen-inner">
-      <p class="text-sm text-muted">
-        Şu an için okunmamış bildiriminiz bulunmuyor. Randevularınızda değişiklik olduğunda burada göreceksiniz.
-      </p>
-    </div>
-  </section>
-
-  <!-- TAB BAR -->
-  <div class="tabbar">
-    <div class="tab-btn active" data-target="home" onclick="switchTab('home')">
-      <span class="icon">🏠</span>
-      Ana Sayfa
-    </div>
-    <div class="tab-btn" data-target="reservations" onclick="switchTab('reservations')">
-      <span class="icon">📅</span>
-      Randevular
-    </div>
-    <div class="tab-btn" data-target="notifications" onclick="switchTab('notifications')">
-      <span class="icon">🔔</span>
-      Bildirim
-    </div>
-    <div class="tab-btn" data-target="profile" onclick="switchTab('profile')">
-      <span class="icon">👤</span>
-      Profil
-    </div>
-  </div>
-
-</div>
-
-<script>
-  // ==== DATA ====
-  const STORAGE_USER = 'at_user';
-  const STORAGE_RES = 'at_reservations';
-
-  const barbers = [
-    {id:'b1', name:'Ahmet Tekeli', age:38},
-    {id:'b2', name:'Kemal Yar', age:39},
-    {id:'b3', name:'Yunus Akar', age:30}
-  ];
-
-  const serviceCategories = [
-    {
-      name:'Saç Bakım & Tıraş',
-      items:[
-        {id:'s1', name:'Saç ve Sakal Tıraşı', duration:45, price:500},
-        {id:'s2', name:'Saç Tıraşı', duration:30, price:300},
-        {id:'s3', name:'Sakal Tıraşı', duration:15, price:200},
-        {id:'s4', name:'Saç Bakım Maskesi', duration:20, price:250}
-      ]
-    },
-    {
-      name:'Bakım & Ek Hizmetler',
-      items:[
-        {id:'s5', name:'Yüz Bakımı', duration:30, price:350},
-        {id:'s6', name:'Kaş Alma', duration:15, price:150},
-        {id:'s7', name:'Saç Yıkama & Fön', duration:15, price:150}
-      ]
-    }
-  ];
-
-  let currentUser = null;
-  let reservations = [];
-  let booking = {
-    barberId:null,
-    serviceIds:[],
-    note:'',
-    date:'',
-    timeStart:null // minutes
+import React, { useState, useEffect } from 'react';
+
+const BerberSistemi = () => {
+  // --- STATE YÖNETİMİ ---
+  const [islemler, setIslemler] = useState([]);
+  const [randevular, setRandevular] = useState([]);
+  const [islemForm, setIslemForm] = useState({ baslik: '', miktar: '', tip: 'gelir' });
+  const [randevuForm, setRandevuForm] = useState({ ad: '', saat: '', islem: 'Saç Kesimi' });
+
+  // --- VERİLERİ YÜKLE VE KAYDET ---
+  useEffect(() => {
+    const kayitliIslemler = JSON.parse(localStorage.getItem('berber_islemler')) || [];
+    const kayitliRandevular = JSON.parse(localStorage.getItem('berber_randevular')) || [];
+    setIslemler(kayitliIslemler);
+    setRandevular(kayitliRandevular);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('berber_islemler', JSON.stringify(islemler));
+    localStorage.setItem('berber_randevular', JSON.stringify(randevular));
+  }, [islemler, randevular]);
+
+  // --- FONKSİYONLAR ---
+  const islemEkle = (e) => {
+    e.preventDefault();
+    if (!islemForm.baslik || !islemForm.miktar) return;
+    setIslemler([{ ...islemForm, id: Date.now(), tarih: new Date().toLocaleDateString() }, ...islemler]);
+    setIslemForm({ baslik: '', miktar: '', tip: 'gelir' });
   };
 
-  // ==== HELPERS ====
-  function showToast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2500);
-  }
+  const randevuEkle = (e) => {
+    e.preventDefault();
+    if (!randevuForm.ad || !randevuForm.saat) return;
+    const yeniListe = [...randevular, { ...randevuForm, id: Date.now() }]
+      .sort((a, b) => a.saat.localeCompare(b.saat));
+    setRandevular(yeniListe);
+    setRandevuForm({ ad: '', saat: '', islem: 'Saç Kesimi' });
+  };
 
-  function saveToStorage(){
-    localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
-    localStorage.setItem(STORAGE_RES, JSON.stringify(reservations));
-  }
+  const silRandevu = (id) => setRandevular(randevular.filter(r => r.id !== id));
+  const silIslem = (id) => setIslemler(islemler.filter(i => i.id !== id));
 
-  function loadFromStorage(){
-    const u = localStorage.getItem(STORAGE_USER);
-    const r = localStorage.getItem(STORAGE_RES);
-    if(u){ currentUser = JSON.parse(u); }
-    if(r){ reservations = JSON.parse(r); }
-  }
+  const gelirToplam = islemler.filter(i => i.tip === 'gelir').reduce((a, b) => a + Number(b.miktar), 0);
+  const giderToplam = islemler.filter(i => i.tip === 'gider').reduce((a, b) => a + Number(b.miktar), 0);
 
-  function formatMoney(v){return v.toLocaleString('tr-TR')+' ₺';}
-  function formatTime(min){
-    const h = String(Math.floor(min/60)).padStart(2,'0');
-    const m = String(min%60).padStart(2,'0');
-    return `${h}:${m}`;
-  }
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 font-sans">
+      {/* HEADER / LOGO ALANI */}
+      <div className="flex flex-col items-center mb-8">
+        <div className="w-20 h-20 bg-black rounded-full border-2 border-yellow-500 flex items-center justify-center shadow-lg shadow-yellow-500/20 mb-2">
+          <span className="text-4xl font-serif text-yellow-500 font-bold italic">A</span>
+        </div>
+        <h1 className="text-xl font-bold tracking-widest text-yellow-500 uppercase">Premium Berber Takip</h1>
+      </div>
 
-  function formatDateDisplay(iso){
-    if(!iso) return '-';
-    const d = new Date(iso);
-    if(isNaN(d)) return iso;
-    return d.toISOString().slice(0,10);
-  }
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        {/* SOL KOLON: RANDEVULAR */}
+        <div className="space-y-6">
+          <section className="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-xl">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-blue-400">
+              📅 Günlük Randevular
+            </h2>
+            <form onSubmit={randevuEkle} className="space-y-2 mb-4">
+              <input 
+                className="w-full bg-gray-700 border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Müşteri Adı"
+                value={randevuForm.ad}
+                onChange={(e) => setRandevuForm({...randevuForm, ad: e.target.value})}
+              />
+              <div className="flex gap-2">
+                <input 
+                  type="time"
+                  className="w-1/2 bg-gray-700 border-none rounded-lg p-3 text-sm outline-none"
+                  value={randevuForm.saat}
+                  onChange={(e) => setRandevuForm({...randevuForm, saat: e.target.value})}
+                />
+                <button className="w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition">Ekle</button>
+              </div>
+            </form>
 
-  // ==== SCREEN SWITCH ====
-  function showScreen(id){
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    const el = document.getElementById('screen-'+id);
-    if(el) el.classList.add('active');
-  }
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {randevular.map(r => (
+                <div key={r.id} className="flex justify-between items-center bg-gray-700/50 p-3 rounded-xl border border-gray-600">
+                  <div className="flex items-center gap-3">
+                    <span className="text-blue-400 font-mono font-bold">{r.saat}</span>
+                    <span className="font-medium uppercase text-sm tracking-wide">{r.ad}</span>
+                  </div>
+                  <button onClick={() => silRandevu(r.id)} className="text-gray-500 hover:text-red-500 text-xl">×</button>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
 
-  function switchTab(target){
-    document.querySelectorAll('.tab-btn').forEach(t=>{
-      t.classList.toggle('active', t.dataset.target===target);
-    });
-    if(target==='home'){ showScreen('home'); }
-    if(target==='reservations'){ refreshReservations(); showScreen('reservations'); }
-    if(target==='notifications'){ showScreen('notifications'); }
-    if(target==='profile'){ loadProfileFields(); showScreen('profile'); }
-  }
-
-  function goHome(){
-    switchTab('home');
-  }
-
-  function openAbout(){
-    showScreen('about');
-  }
-  function openNotifications(){
-    switchTab('notifications');
-  }
-
-  // ==== AUTH / WELCOME ====
-  function showAuthForm(){
-    document.getElementById('auth-form').style.display='block';
-  }
-
-  function continueAsGuest(){
-    if(!currentUser){
-      currentUser = {name:'Misafir', age:'', phone:''};
-      saveToStorage();
-    }
-    initAfterAuth();
-  }
-
-  function saveUser(){
-    const name = document.getElementById('auth-name').value.trim();
-    const age = document.getElementById('auth-age').value.trim();
-    const phone = document.getElementById('auth-phone').value.trim();
-    if(!name){
-      showToast('Lütfen ad soyad giriniz.');
-      return;
-    }
-    currentUser = {name, age, phone};
-    saveToStorage();
-    initAfterAuth();
-  }
-
-  function initAfterAuth(){
-    document.getElementById('home-username').textContent = currentUser?.name || 'Misafir';
-    renderHomeBarbers();
-    refreshReservations();
-    showScreen('home');
-  }
-
-  // ==== HOME RENDER ====
-  function renderHomeBarbers(){
-    const row = document.getElementById('home-barber-row');
-    row.innerHTML='';
-    barbers.forEach(b=>{
-      const card = document.createElement('div');
-      card.className='barber-card';
-      card.innerHTML = `
-        <div class="barber-avatar"></div>
-        <div class="barber-name">${b.name}</div>
-        <div class="barber-age">${b.age} yaşında</div>
-      `;
-      row.appendChild(card);
-    });
-  }
-
-  function openBarberList(){
-    startReservation();
-  }
-  function openServicesList(){
-    // direkt hizmet seçimine geçmeden önce berber soralım
-    startReservation();
-  }
-
-  function startReservation(){
-    booking = {barberId:null, serviceIds:[], note:'', date:'', timeStart:null};
-    renderBarberSelection();
-    showScreen('book-barber');
-  }
-
-  // ==== BOOKING: BARBER ====
-  function renderBarberSelection(){
-    const wrap = document.getElementById('book-barber-list');
-    wrap.innerHTML='';
-    barbers.forEach(b=>{
-      const card = document.createElement('div');
-      card.className='barber-card mt-8';
-      card.dataset.id = b.id;
-      card.onclick = ()=>selectBarber(b.id);
-      card.innerHTML = `
-        <div class="barber-avatar"></div>
-        <div class="barber-name">${b.name}</div>
-        <div class="barber-age">${b.age} yaşında</div>
-      `;
-      wrap.appendChild(card);
-    });
-  }
-
-  function selectBarber(id){
-    booking.barberId = id;
-    document.querySelectorAll('#book-barber-list .barber-card').forEach(c=>{
-      c.classList.toggle('selected', c.dataset.id===id);
-    });
-    setTimeout(()=>{ renderServiceSelection(); showScreen('book-services'); },250);
-  }
-
-  function backToBarber(){
-    showScreen('book-barber');
-  }
-
-  // ==== BOOKING: SERVICES ====
-  function renderServiceSelection(){
-    const title = document.getElementById('book-services-title');
-    const b = barbers.find(x=>x.id===booking.barberId);
-    title.textContent = b ? `Hizmet Seçimi • ${b.name}` : 'Hizmet Seçimi';
-
-    const container = document.getElementById('service-category-blocks');
-    container.innerHTML='';
-    serviceCategories.forEach(cat=>{
-      const h = document.createElement('div');
-      h.className='service-cat';
-      h.textContent = cat.name;
-      container.appendChild(h);
-
-      const list = document.createElement('div');
-      list.className='service-list';
-
-      cat.items.forEach(s=>{
-        const item = document.createElement('div');
-        item.className='service-item';
-        item.dataset.id=s.id;
-        item.onclick = ()=>toggleService(s.id);
-        item.innerHTML = `
-          <div>
-            <div>${s.name}</div>
-            <div class="meta">${s.duration} dk • ${formatMoney(s.price)}</div>
+        {/* SAĞ KOLON: KASA YÖNETİMİ */}
+        <div className="space-y-6">
+          {/* Kasa Özeti */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-green-900/30 border border-green-800 p-4 rounded-2xl text-center">
+              <p className="text-xs text-green-500 uppercase font-bold">Gelir</p>
+              <p className="text-2xl font-bold text-green-400">{gelirToplam}₺</p>
+            </div>
+            <div className="bg-red-900/30 border border-red-800 p-4 rounded-2xl text-center">
+              <p className="text-xs text-red-500 uppercase font-bold">Gider</p>
+              <p className="text-2xl font-bold text-red-400">{giderToplam}₺</p>
+            </div>
           </div>
-        `;
-        list.appendChild(item);
-      });
 
-      container.appendChild(list);
-    });
+          {/* Gelir-Gider Formu */}
+          <section className="bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-xl">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-yellow-500">
+              💰 Kasa İşlemi
+            </h2>
+            <form onSubmit={islemEkle} className="space-y-2">
+              <input 
+                className="w-full bg-gray-700 border-none rounded-lg p-3 text-sm outline-none"
+                placeholder="İşlem Açıklaması"
+                value={islemForm.baslik}
+                onChange={(e) => setIslemForm({...islemForm, baslik: e.target.value})}
+              />
+              <div className="flex gap-2">
+                <input 
+                  type="number"
+                  className="w-1/2 bg-gray-700 border-none rounded-lg p-3 text-sm outline-none"
+                  placeholder="Miktar"
+                  value={islemForm.miktar}
+                  onChange={(e) => setIslemForm({...islemForm, miktar: e.target.value})}
+                />
+                <select 
+                  className="w-1/2 bg-gray-700 border-none rounded-lg p-3 text-sm outline-none"
+                  value={islemForm.tip}
+                  onChange={(e) => setIslemForm({...islemForm, tip: e.target.value})}
+                >
+                  <option value="gelir">Gelir (+)</option>
+                  <option value="gider">Gider (-)</option>
+                </select>
+              </div>
+              <button className="w-full bg-yellow-600 hover:bg-yellow-700 text-black font-extrabold py-3 rounded-lg transition uppercase tracking-tighter">İşlemi Kaydet</button>
+            </form>
+          </section>
 
-    updateSelectedServicesUI();
-  }
+          {/* Son Hareketler Listesi */}
+          <div className="bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden shadow-xl">
+            <div className="p-3 bg-gray-700/50 text-xs font-bold uppercase tracking-widest text-gray-400">Son Hareketler</div>
+            <div className="max-h-48 overflow-y-auto">
+              {islemler.map(i => (
+                <div key={i.id} className="p-3 border-b border-gray-700 flex justify-between items-center hover:bg-gray-700/30">
+                  <div>
+                    <p className="text-sm font-medium">{i.baslik}</p>
+                    <p className="text-[10px] text-gray-500">{i.tarih}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`font-bold ${i.tip === 'gelir' ? 'text-green-400' : 'text-red-400'}`}>
+                      {i.tip === 'gelir' ? '+' : '-'}{i.miktar}₺
+                    </span>
+                    <button onClick={() => silIslem(i.id)} className="text-gray-600 hover:text-red-500">×</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-  function toggleService(id){
-    const idx = booking.serviceIds.indexOf(id);
-    if(idx>=0) booking.serviceIds.splice(idx,1);
-    else booking.serviceIds.push(id);
-    updateSelectedServicesUI();
-  }
-
-  function getServiceById(id){
-    for(const cat of serviceCategories){
-      const f = cat.items.find(i=>i.id===id);
-      if(f) return f;
-    }
-    return null;
-  }
-
-  function updateSelectedServicesUI(){
-    document.querySelectorAll('.service-item').forEach(item=>{
-      const id = item.dataset.id;
-      item.classList.toggle('active', booking.serviceIds.includes(id));
-    });
-
-    const box = document.getElementById('selected-services-box');
-    if(booking.serviceIds.length===0){
-      box.textContent = 'Henüz hizmet seçmediniz.';
-    }else{
-      const lines = booking.serviceIds.map(id=>{
-        const s = getServiceById(id);
-        return `• ${s.name} (${s.duration} dk / ${formatMoney(s.price)})`;
-      }).join('\n');
-      box.textContent = 'Seçilen Hizmetler:\n'+lines;
-    }
-
-    let count = booking.serviceIds.length;
-    let duration = 0;
-    let price = 0;
-    booking.serviceIds.forEach(id=>{
-      const s = getServiceById(id);
-      if(s){ duration += s.duration; price += s.price; }
-    });
-    document.getElementById('sum-count').textContent = `${count} hizmet`;
-    document.getElementById('sum-duration').textContent = `${duration} dk`;
-    document.getElementById('sum-price').textContent = formatMoney(price);
-  }
-
-  function goToDateTime(){
-    if(!booking.barberId){
-      showToast('Önce berber seçin.');
-      return;
-    }
-    if(booking.serviceIds.length===0){
-      showToast('Lütfen en az bir hizmet seçin.');
-      return;
-    }
-    renderDateTimeScreen();
-    showScreen('book-datetime');
-  }
-
-  function backToServices(){
-    showScreen('book-services');
-  }
-
-  // ==== BOOKING: DATE & TIME ====
-  function renderDateTimeScreen(){
-    const b = barbers.find(x=>x.id===booking.barberId);
-    document.getElementById('summary-barber').textContent = b?b.name:'-';
-    document.getElementById('summary-customer').textContent = currentUser?.name || 'Misafir';
-
-    let count = booking.serviceIds.length;
-    let duration = 0;
-    let price = 0;
-    const ul = document.getElementById('summary-services-list');
-    ul.innerHTML='';
-    booking.serviceIds.forEach(id=>{
-      const s = getServiceById(id);
-      if(!s) return;
-      duration += s.duration;
-      price += s.price;
-      const li = document.createElement('li');
-      li.textContent = `${s.name} (${s.duration} dk / ${formatMoney(s.price)})`;
-      ul.appendChild(li);
-    });
-    document.getElementById('summary-count').textContent = `${count} adet`;
-    document.getElementById('summary-duration').textContent = `${duration} dk`;
-    document.getElementById('summary-price').textContent = formatMoney(price);
-
-    document.getElementById('summary-date').textContent = booking.date ? formatDateDisplay(booking.date) : '-';
-    document.getElementById('summary-time').textContent = booking.timeStart!=null ? `${formatTime(booking.timeStart)} - ${formatTime(booking.timeStart+duration)}` : '-';
-
-    const dateInput = document.getElementById('date-input');
-    const today = new Date().toISOString().slice(0,10);
-    dateInput.min = today;
-    if(booking.date){
-      dateInput.value = booking.date;
-    }else{
-      dateInput.value = today;
-      booking.date = today;
-    }
-    generateTimeSlotsForSelectedDate();
-  }
-
-  function getTotalDuration(){
-    return booking.serviceIds.reduce((acc,id)=>{
-      const s = getServiceById(id);
-      return acc + (s?s.duration:0);
-    },0);
-  }
-
-  function generateTimeSlotsForSelectedDate(){
-    const grid = document.getElementById('time-grid');
-    grid.innerHTML='';
-    const date = booking.date;
-    const barberId = booking.barberId;
-    const duration = getTotalDuration();
-    const open = 9*60;  // 09:00
-    const close = 20*60; // 20:00
-    const step = 15;
-
-    for(let t=open; t+duration<=close; t+=step){
-      const slot = document.createElement('div');
-      slot.className='time-slot';
-      const free = isSlotFree(barberId,date,t,duration);
-      slot.classList.add(free?'free':'busy');
-      slot.textContent = `${formatTime(t)}`;
-      if(free){
-        slot.onclick = ()=>selectTimeSlot(t);
-      }
-      if(booking.timeStart===t){
-        slot.classList.add('selected');
-      }
-      grid.appendChild(slot);
-    }
-  }
-
-  function isSlotFree(barberId,date,start,duration){
-    const end = start+duration;
-    return !reservations.some(r=>{
-      if(r.barberId!==barberId) return false;
-      if(r.date!==date) return false;
-      return !(end<=r.startMin || start>=r.endMin); // çakışma varsa false
-    });
-  }
-
-  function selectTimeSlot(t){
-    booking.timeStart = t;
-    generateTimeSlotsForSelectedDate();
-    document.getElementById('summary-date').textContent = formatDateDisplay(booking.date);
-    document.getElementById('summary-time').textContent =
-      `${formatTime(t)} - ${formatTime(t+getTotalDuration())}`;
-  }
-
-  document.getElementById('date-input').addEventListener('change',e=>{
-    booking.date = e.target.value;
-    booking.timeStart = null;
-    document.getElementById('summary-date').textContent = formatDateDisplay(booking.date);
-    document.getElementById('summary-time').textContent = '-';
-    generateTimeSlotsForSelectedDate();
-  });
-
-  function confirmReservation(){
-    if(!booking.date){
-      showToast('Lütfen tarih seçin.');
-      return;
-    }
-    if(booking.timeStart==null){
-      showToast('Lütfen saat seçin.');
-      return;
-    }
-
-    const duration = getTotalDuration();
-    const res = {
-      id: 'r'+Date.now(),
-      userName: currentUser?.name || 'Misafir',
-      barberId: booking.barberId,
-      barberName: barbers.find(b=>b.id===booking.barberId)?.name || '',
-      services: booking.serviceIds.map(id=>getServiceById(id)),
-      date: booking.date,
-      startMin: booking.timeStart,
-      endMin: booking.timeStart+duration,
-      duration,
-      price: booking.serviceIds.reduce((acc,id)=>acc+(getServiceById(id)?.price||0),0),
-      note: document.getElementById('note-input').value.trim()
-    };
-
-    // çakışma kontrolü (ekstra güvenlik)
-    if(!isSlotFree(res.barberId,res.date,res.startMin,res.duration)){
-      showToast('Bu saat aralığı dolu, lütfen başka saat seçin.');
-      generateTimeSlotsForSelectedDate();
-      return;
-    }
-
-    reservations.push(res);
-    saveToStorage();
-    showToast('Randevunuz oluşturuldu.');
-    refreshReservations();
-    switchTab('reservations');
-  }
-
-  // ==== RESERVATIONS LIST ====
-  function refreshReservations(){
-    const list = document.getElementById('res-list');
-    list.innerHTML='';
-    if(reservations.length===0){
-      list.innerHTML = '<p class="text-sm text-muted">Henüz randevunuz bulunmuyor. Ana ekrandan yeni bir randevu oluşturabilirsiniz.</p>';
-      return;
-    }
-    reservations
-      .slice()
-      .sort((a,b)=> (a.date+a.startMin) > (b.date+b.startMin) ? 1 : -1)
-      .forEach((r,idx)=>{
-        const card = document.createElement('div');
-        card.className='res-card';
-        card.innerHTML = `
-          <div class="res-pill-num">#${idx+1}</div>
-          <button class="btn btn-sm btn-danger res-delete" onclick="deleteReservation('${r.id}')">Sil</button>
-          <div class="res-title">Berber: ${r.barberName}</div>
-          <div class="res-date">Tarih: ${r.date} • Saat: ${formatTime(r.startMin)} - ${formatTime(r.endMin)}</div>
-          <div class="res-more" onclick="showReservationDetail('${r.id}')">Detay için dokunun ↓</div>
-        `;
-        list.appendChild(card);
-      });
-  }
-
-  function deleteReservation(id){
-    if(!confirm('Bu randevuyu silmek istediğinize emin misiniz?')) return;
-    reservations = reservations.filter(r=>r.id!==id);
-    saveToStorage();
-    refreshReservations();
-    showToast('Randevu silindi.');
-  }
-
-  function showReservationDetail(id){
-    const r = reservations.find(x=>x.id===id);
-    if(!r) return;
-    const servicesText = r.services.map(s=>`${s.name} (${s.duration} dk / ${formatMoney(s.price)})`).join('\n');
-    alert(
-      `Berber: ${r.barberName}\n`+
-      `Müşteri: ${r.userName}\n`+
-      `Tarih: ${r.date}\n`+
-      `Saat: ${formatTime(r.startMin)} - ${formatTime(r.endMin)}\n`+
-      `Hizmetler:\n${servicesText}\n\n`+
-      `Toplam Süre: ${r.duration} dk\n`+
-      `Toplam Ücret: ${formatMoney(r.price)}\n`+
-      (r.note?`\nNot: ${r.note}`:'')
-    );
-  }
-
-  // ==== PROFILE ====
-  function loadProfileFields(){
-    document.getElementById('profile-name').value = currentUser?.name || '';
-    document.getElementById('profile-age').value = currentUser?.age || '';
-    document.getElementById('profile-phone').value = currentUser?.phone || '';
-  }
-
-  function saveProfile(){
-    if(!currentUser) currentUser = {};
-    currentUser.name = document.getElementById('profile-name').value.trim() || 'Misafir';
-    currentUser.age = document.getElementById('profile-age').value.trim();
-    currentUser.phone = document.getElementById('profile-phone').value.trim();
-    saveToStorage();
-    document.getElementById('home-username').textContent = currentUser.name;
-    showToast('Profil güncellendi.');
-  }
-
-  function deleteAccount(){
-    if(!confirm('Hesabınızı ve tüm randevularınızı silmek istediğinize emin misiniz?')) return;
-    localStorage.removeItem(STORAGE_USER);
-    localStorage.removeItem(STORAGE_RES);
-    currentUser = null;
-    reservations = [];
-    showToast('Hesabınız silindi.');
-    showScreen('welcome');
-  }
-
-  // ==== INIT ====
-  loadFromStorage();
-  if(currentUser){
-    initAfterAuth();
-  }else{
-    showScreen('welcome');
-  }
-</script>
-</body>
-</html>
+export default BerberSistemi;
