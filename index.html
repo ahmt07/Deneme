@@ -1,189 +1,181 @@
 import React, { useState, useEffect } from 'react';
 
 const BerberFullSistem = () => {
-  // --- STATE ---
-  const [islemler, setIslemler] = useState([]);
+  // --- DURUM YÖNETİMİ (STATE) ---
+  const [isAdmin, setIsAdmin] = useState(false);
   const [randevular, setRandevular] = useState([]);
+  const [islemler, setIslemler] = useState([]);
   const [hizmetler, setHizmetler] = useState([
     { id: 1, ad: 'Saç Kesimi', fiyat: 300 },
     { id: 2, ad: 'Sakal Tıraşı', fiyat: 150 },
-    { id: 3, ad: 'Saç + Sakal', fiyat: 400 }
+    { id: 3, ad: 'Saç + Sakal', fiyat: 400 },
+    { id: 4, ad: 'Cilt Bakımı', fiyat: 200 }
   ]);
-  
-  const [islemForm, setIslemForm] = useState({ baslik: '', miktar: '', tip: 'gelir' });
-  const [randevuForm, setRandevuForm] = useState({ ad: '', saat: '', islem: 'Saç Kesimi' });
-  const [adminModu, setAdminModu] = useState(false);
 
-  // --- LOCALSTORAGE ---
+  // Şifrenizi buradan değiştirebilirsiniz
+  const ADMIN_SIFRE = "1923"; 
+
+  // --- VERİLERİ YÜKLE VE KAYDET (LOCALSTORAGE) ---
   useEffect(() => {
-    const kIslemler = JSON.parse(localStorage.getItem('b_islemler')) || [];
     const kRandevular = JSON.parse(localStorage.getItem('b_randevular')) || [];
+    const kIslemler = JSON.parse(localStorage.getItem('b_islemler')) || [];
     const kHizmetler = JSON.parse(localStorage.getItem('b_hizmetler')) || hizmetler;
-    setIslemler(kIslemler);
     setRandevular(kRandevular);
+    setIslemler(kIslemler);
     setHizmetler(kHizmetler);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('b_islemler', JSON.stringify(islemler));
     localStorage.setItem('b_randevular', JSON.stringify(randevular));
+    localStorage.setItem('b_islemler', JSON.stringify(islemler));
     localStorage.setItem('b_hizmetler', JSON.stringify(hizmetler));
-  }, [islemler, randevular, hizmetler]);
+  }, [randevular, islemler, hizmetler]);
 
-  // --- AKSİYONLAR ---
-  const islemEkle = (e) => {
+  // --- FONKSİYONLAR ---
+  const musteriRandevuAl = (e) => {
     e.preventDefault();
-    setIslemler([{ ...islemForm, id: Date.now(), tarih: new Date().toLocaleDateString() }, ...islemler]);
-    setIslemForm({ baslik: '', miktar: '', tip: 'gelir' });
+    const ad = e.target.ad.value;
+    const saat = e.target.saat.value;
+    if (!ad || !saat) return;
+    setRandevular([...randevular, { id: Date.now(), ad, saat }].sort((a, b) => a.saat.localeCompare(b.saat)));
+    e.target.reset();
+    alert("Randevunuz başarıyla oluşturuldu!");
   };
 
-  const hizmetSil = (id) => setHizmetler(hizmetler.filter(h => h.id !== id));
-  const islemSil = (id) => setIslemler(islemler.filter(i => i.id !== id));
+  const islemEkle = (baslik, miktar, tip) => {
+    setIslemler([{ id: Date.now(), baslik, miktar, tip, tarih: new Date().toLocaleDateString() }, ...islemler]);
+  };
 
-  // --- HESAPLAMALAR ---
-  const gelir = islemler.filter(i => i.tip === 'gelir').reduce((a, b) => a + Number(b.miktar), 0);
-  const gider = islemler.filter(i => i.tip === 'gider').reduce((a, b) => a + Number(b.miktar), 0);
+  const gelirTop = islemler.filter(i => i.tip === 'gelir').reduce((a, b) => a + Number(b.miktar), 0);
+  const giderTop = islemler.filter(i => i.tip === 'gider').reduce((a, b) => a + Number(b.miktar), 0);
 
   return (
-    <div className="min-h-screen bg-black text-gray-200 p-4 max-w-5xl mx-auto">
-      {/* ÜST BAR & ADMIN SWITCH */}
-      <div className="flex justify-between items-center mb-8 border-b border-yellow-700/30 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center text-black font-bold">A</div>
-          <h1 className="text-xl font-black text-yellow-500 uppercase tracking-tighter">Berber Panel</h1>
-        </div>
-        <button 
-          onClick={() => setAdminModu(!adminModu)}
-          className={`px-4 py-2 rounded-full text-xs font-bold transition ${adminModu ? 'bg-red-600 text-white' : 'bg-gray-800 text-yellow-500 border border-yellow-500'}`}
+    <div className="min-h-screen bg-black text-gray-100 p-4 font-sans">
+      
+      {/* ÜST LOGO ALANI */}
+      <div className="max-w-4xl mx-auto text-center mb-10">
+        <div 
+          onClick={() => {
+            const pw = prompt("Yönetici Şifresi:");
+            if(pw === ADMIN_SIFRE) setIsAdmin(true);
+          }}
+          className="w-20 h-20 bg-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-4xl font-bold shadow-[0_0_20px_rgba(202,138,4,0.4)] cursor-pointer active:scale-90 transition"
         >
-          {adminModu ? 'YÖNETİMİ KAPAT' : 'HİZMETLERİ DÜZENLE'}
-        </button>
+          A
+        </div>
+        <h1 className="text-2xl font-black text-yellow-500 tracking-tighter uppercase italic">Premium Barber</h1>
+        <p className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">Style & Precision</p>
       </div>
 
-      {adminModu ? (
-        /* --- ADMIN / HİZMET DÜZENLEME PANELİ --- */
-        <div className="bg-gray-900 p-6 rounded-3xl border border-yellow-600/20">
-          <h2 className="text-yellow-500 font-bold mb-4 uppercase text-center">Hizmet ve Fiyat Listesi</h2>
-          <div className="grid gap-3">
-            {hizmetler.map(h => (
-              <div key={h.id} className="flex justify-between items-center bg-black p-4 rounded-xl border border-gray-800">
-                <span className="font-bold">{h.ad} - <span className="text-green-500">{h.fiyat}₺</span></span>
-                <button onClick={() => hizmetSil(h.id)} className="text-red-500 text-xs font-bold">SİL</button>
-              </div>
-            ))}
-            <button 
-              onClick={() => {
-                const ad = prompt("Hizmet Adı:");
-                const fiyat = prompt("Fiyatı:");
-                if(ad && fiyat) setHizmetler([...hizmetler, {id: Date.now(), ad, fiyat}]);
-              }}
-              className="mt-4 bg-green-700 p-3 rounded-xl font-bold uppercase text-sm"
-            >
-              + Yeni Hizmet Ekle
-            </button>
+      <div className="max-w-4xl mx-auto">
+        {!isAdmin ? (
+          /* ================= MÜŞTERİ PANELİ ================= */
+          <div className="max-w-md mx-auto bg-gray-900/50 p-8 rounded-3xl border border-gray-800 shadow-2xl">
+            <h2 className="text-xl font-bold mb-6 text-center text-blue-400 uppercase tracking-tight">Hızlı Randevu Al</h2>
+            <form onSubmit={musteriRandevuAl} className="space-y-4">
+              <input name="ad" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-500 transition text-sm" placeholder="Adınız Soyadınız" required />
+              <input name="saat" type="time" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-500 transition text-sm" required />
+              <button className="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl font-black uppercase tracking-widest transition shadow-lg shadow-blue-600/20 active:scale-95">Randevuyu Onayla</button>
+            </form>
+            <p className="text-center text-[9px] text-gray-600 mt-6 italic">Mesai saatlerimiz dışındaki randevular geçersiz sayılabilir.</p>
           </div>
-        </div>
-      ) : (
-        /* --- ANA KULLANICI PANELİ --- */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* KASA & İŞLEM */}
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-900 p-4 rounded-2xl border-l-4 border-green-500 shadow-lg">
-                <p className="text-[10px] text-gray-500 uppercase">Kasa (Net)</p>
-                <p className="text-2xl font-black text-green-400">{gelir - gider}₺</p>
+        ) : (
+          /* ================= YÖNETİCİ PANELİ ================= */
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="flex justify-between items-center bg-yellow-600/10 p-4 rounded-2xl border border-yellow-600/30">
+              <div className="text-xs">
+                <p className="text-yellow-500 font-bold uppercase tracking-widest">Yönetici Modu</p>
+                <p className="text-gray-400">Hoş geldin, Patron.</p>
               </div>
-              <div className="bg-gray-900 p-4 rounded-2xl border-l-4 border-red-500 shadow-lg">
-                <p className="text-[10px] text-gray-500 uppercase">Toplam Gider</p>
-                <p className="text-2xl font-black text-red-400">{gider}₺</p>
+              <button onClick={() => setIsAdmin(false)} className="bg-red-900/40 text-red-500 border border-red-900 px-4 py-2 rounded-xl text-xs font-black hover:bg-red-900/60 transition">ÇIKIŞ YAP</button>
+            </div>
+
+            {/* İSTATİSTİKLER */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
+                <p className="text-[9px] text-gray-500 uppercase">Kasa (Net)</p>
+                <p className="text-xl font-bold text-green-500">{gelirTop - giderTop}₺</p>
+              </div>
+              <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
+                <p className="text-[9px] text-gray-500 uppercase">Randevu</p>
+                <p className="text-xl font-bold text-blue-400">{randevular.length}</p>
+              </div>
+              <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
+                <p className="text-[9px] text-gray-500 uppercase">Gider</p>
+                <p className="text-xl font-bold text-red-500">{giderTop}₺</p>
               </div>
             </div>
 
-            <div className="bg-gray-900 p-5 rounded-3xl border border-gray-800">
-              <h3 className="text-sm font-bold mb-4 text-yellow-500 uppercase tracking-widest">Hızlı Satış</h3>
-              <form onSubmit={islemEkle} className="space-y-3">
-                <select 
-                  className="w-full bg-black border border-gray-700 p-3 rounded-xl outline-none"
-                  onChange={(e) => {
-                    const secilen = hizmetler.find(h => h.ad === e.target.value);
-                    if(secilen) setIslemForm({...islemForm, baslik: secilen.ad, miktar: secilen.fiyat});
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* RANDEVULAR */}
+              <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xl">
+                <h3 className="text-sm font-bold mb-4 text-blue-400 uppercase tracking-widest">Gelecek Randevular</h3>
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
+                  {randevular.length === 0 && <p className="text-gray-600 text-xs italic">Şu an randevu yok.</p>}
+                  {randevular.map(r => (
+                    <div key={r.id} className="flex justify-between items-center bg-black p-4 rounded-2xl border border-gray-800">
+                      <div>
+                        <p className="text-blue-400 font-bold text-xs">{r.saat}</p>
+                        <p className="font-bold uppercase text-sm">{r.ad}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => {
+                          const f = prompt("Ücret Girin:", "300");
+                          if(f) { islemEkle(r.ad + " Tıraşı", f, 'gelir'); setRandevular(randevular.filter(x => x.id !== r.id)); }
+                        }} className="text-green-500 text-[10px] font-bold border border-green-900 px-2 py-1 rounded">ONAYLA</button>
+                        <button onClick={() => setRandevular(randevular.filter(x => x.id !== r.id))} className="text-red-500 font-bold text-xs px-2">×</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* KASA HIZLI GİRİŞ */}
+              <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xl">
+                <h3 className="text-sm font-bold mb-4 text-green-500 uppercase tracking-widest">Hızlı Kasa</h3>
+                <div className="space-y-2 mb-4">
+                  {hizmetler.map(h => (
+                    <button 
+                      key={h.id} 
+                      onClick={() => islemEkle(h.ad, h.fiyat, 'gelir')}
+                      className="w-full flex justify-between bg-black p-3 rounded-xl border border-gray-800 hover:border-yellow-600 transition text-sm text-left"
+                    >
+                      <span>{h.ad}</span>
+                      <span className="font-bold text-yellow-500">{h.fiyat}₺</span>
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => {
+                    const ad = prompt("Harcama Adı:");
+                    const m = prompt("Miktar:");
+                    if(ad && m) islemEkle(ad, m, 'gider');
                   }}
+                  className="w-full border-2 border-dashed border-red-900/50 p-3 rounded-xl text-red-500 text-[10px] font-bold uppercase hover:bg-red-900/10 transition"
                 >
-                  <option>Hizmet Seçin...</option>
-                  {hizmetler.map(h => <option key={h.id} value={h.ad}>{h.ad} ({h.fiyat}₺)</option>)}
-                </select>
-                <div className="flex gap-2">
-                  <input 
-                    className="w-full bg-black border border-gray-700 p-3 rounded-xl outline-none text-green-500 font-bold"
-                    placeholder="Tutar"
-                    value={islemForm.miktar}
-                    onChange={(e) => setIslemForm({...islemForm, miktar: e.target.value})}
-                  />
-                  <select 
-                    className="bg-black border border-gray-700 p-3 rounded-xl outline-none text-xs"
-                    value={islemForm.tip}
-                    onChange={(e) => setIslemForm({...islemForm, tip: e.target.value})}
-                  >
-                    <option value="gelir">GELİR</option>
-                    <option value="gider">GİDER</option>
-                  </select>
-                </div>
-                <button className="w-full bg-yellow-600 p-4 rounded-2xl text-black font-black uppercase shadow-lg shadow-yellow-600/20 active:scale-95 transition">KAYDET</button>
-              </form>
-            </div>
-          </div>
-
-          {/* RANDEVU LİSTESİ */}
-          <div className="bg-gray-900 p-5 rounded-3xl border border-gray-800 flex flex-col h-[500px]">
-            <h3 className="text-sm font-bold mb-4 text-blue-400 uppercase tracking-widest">Randevu Defteri</h3>
-            <div className="overflow-y-auto space-y-2 flex-1 pr-2">
-              {randevular.map(r => (
-                <div key={r.id} className="flex justify-between items-center bg-black p-4 rounded-2xl border border-gray-800 group relative">
-                  <div>
-                    <p className="text-blue-400 font-bold text-xs">{r.saat}</p>
-                    <p className="font-bold uppercase">{r.ad}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => setRandevular(randevular.filter(x => x.id !== r.id))} className="bg-red-900/30 p-2 rounded-lg text-red-500 text-xs">SİL</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* Hızlı Randevu Ekleme */}
-            <button 
-              onClick={() => {
-                const ad = prompt("Müşteri Adı:");
-                const saat = prompt("Saat (Örn: 14:30):");
-                if(ad && saat) setRandevular([...randevular, {id: Date.now(), ad, saat}].sort((a,b)=>a.saat.localeCompare(b.saat)));
-              }}
-              className="mt-4 border-2 border-dashed border-gray-700 p-3 rounded-2xl text-gray-500 font-bold hover:border-blue-500 hover:text-blue-500 transition"
-            >
-              + Randevu Ekle
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* SON İŞLEMLER LİSTESİ (SİLME ÖZELLİKLİ) */}
-      {!adminModu && (
-        <div className="mt-8 bg-gray-900 rounded-3xl p-5 border border-gray-800">
-          <h3 className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest">Kasa Geçmişi (Silmek için sağa kaydırın)</h3>
-          <div className="space-y-2">
-            {islemler.map(i => (
-              <div key={i.id} className="flex justify-between items-center p-3 border-b border-gray-800/50">
-                <span className="text-sm">{i.baslik} <span className="text-[10px] text-gray-600">({i.tarih})</span></span>
-                <div className="flex items-center gap-4">
-                  <span className={`font-bold ${i.tip === 'gelir' ? 'text-green-500' : 'text-red-500'}`}>
-                    {i.tip === 'gelir' ? '+' : '-'}{i.miktar}₺
-                  </span>
-                  <button onClick={() => islemSil(i.id)} className="text-gray-700 hover:text-red-500 font-bold">×</button>
-                </div>
+                  - Harcama/Gider Ekle
+                </button>
               </div>
-            ))}
+            </div>
+
+            {/* HİZMET YÖNETİMİ & GEÇMİŞ */}
+            <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800">
+              <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 tracking-widest">Kasa Geçmişi</h3>
+              <div className="max-h-40 overflow-y-auto space-y-2">
+                {islemler.map(i => (
+                  <div key={i.id} className="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
+                    <span className="text-gray-300">{i.baslik} <span className="text-[10px] text-gray-600">({i.tarih})</span></span>
+                    <div className="flex gap-4">
+                      <span className={i.tip === 'gelir' ? 'text-green-500' : 'text-red-500'}>{i.tip === 'gelir' ? '+' : '-'}{i.miktar}₺</span>
+                      <button onClick={() => setIslemler(islemler.filter(x => x.id !== i.id))} className="text-gray-700">×</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
