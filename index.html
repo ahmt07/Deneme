@@ -3,161 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ahmet Tekeli - Randevu Sistemi</title>
+    <title>Ahmet Tekeli - Kurumsal Yönetim</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; }
-        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .gold-btn { background: linear-gradient(135deg, #c5a059 0%, #8e6d2f 100%); }
+        body { background: #0a0a0a; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gold-gradient { background: linear-gradient(135deg, #d4af37 0%, #a67c00 100%); }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
-<body class="text-white min-h-screen">
+<body class="text-gray-200">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        function BarberApp() {
-            const [isAdmin, setIsAdmin] = useState(false);
-            const [selectedDate, setSelectedDate] = useState("");
-            const [selectedBerber, setSelectedBerber] = useState("");
-            const [randevular, setRandevular] = useState([]);
-            const [islemler, setIslemler] = useState([]);
+        function App() {
+            const [view, setView] = useState('customer'); // customer | admin
+            const [adminTab, setAdminTab] = useState('randevular'); // randevular | hizmetler | personel
             
-            // Sabit Mesai Saatleri
+            // --- STATE YÖNETİMİ ---
+            const [randevular, setRandevular] = useState([]);
+            const [hizmetler, setHizmetler] = useState([
+                { id: 1, ad: 'Saç Kesimi', fiyat: 350 },
+                { id: 2, ad: 'Sakal Tasarımı', fiyat: 200 }
+            ]);
+            const [berberler, setBerberler] = useState([
+                { id: 1, ad: 'Ahmet Tekeli', uzmanlik: 'Master Barber' }
+            ]);
+
             const mesaiSaatleri = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
 
-            // Örnek Veriler (Bunları Admin Panelinden değiştirebilirsin)
-            const hizmetler = [
-                { ad: 'Saç Kesimi', fiyat: 300 },
-                { ad: 'Sakal Tıraşı', fiyat: 150 },
-                { ad: 'Cilt Bakımı', fiyat: 200 }
-            ];
-            const berberler = ["Ahmet Tekeli", "Usta Mehmet", "Genç Ali"];
-
+            // Verileri Yükle
             useEffect(() => {
-                setRandevular(JSON.parse(localStorage.getItem('b_randevular')) || []);
-                setIslemler(JSON.parse(localStorage.getItem('b_islemler')) || []);
+                const data = JSON.parse(localStorage.getItem('barber_storage')) || {};
+                if(data.randevular) setRandevular(data.randevular);
+                if(data.hizmetler) setHizmetler(data.hizmetler);
+                if(data.berberler) setBerberler(data.berberler);
             }, []);
 
+            // Verileri Kaydet
+            useEffect(() => {
+                localStorage.setItem('barber_storage', JSON.stringify({ randevular, hizmetler, berberler }));
+            }, [randevular, hizmetler, berberler]);
+
+            // --- AKSİYONLAR ---
             const randevuAl = (e) => {
                 e.preventDefault();
-                const formData = new FormData(e.target);
+                const fd = new FormData(e.target);
                 const yeni = {
                     id: Date.now(),
-                    adSoyad: formData.get('adSoyad'),
-                    telefon: formData.get('telefon'),
-                    berber: formData.get('berber'),
-                    hizmet: formData.get('hizmet'),
-                    tarih: selectedDate,
-                    saat: formData.get('saat')
+                    musteri: fd.get('ad'),
+                    tel: fd.get('tel'),
+                    berber: fd.get('berber'),
+                    hizmet: fd.get('hizmet'),
+                    tarih: fd.get('tarih'),
+                    saat: fd.get('saat'),
+                    tip: 'musteri'
                 };
-                const güncellenmiş = [...randevular, yeni];
-                setRandevular(güncellenmiş);
-                localStorage.setItem('b_randevular', JSON.stringify(güncellenmiş));
-                alert("Randevunuz Onaylandı!");
+                setRandevular([...randevular, yeni]);
+                alert("Randevunuz Başarıyla Alındı!");
+                e.target.reset();
             };
 
-            // Belirli bir tarih ve berber için DOLU saatleri bulur
-            const doluSaatler = randevular
-                .filter(r => r.tarih === selectedDate && r.berber === selectedBerber)
-                .map(r => r.saat);
+            const blokla = (tarih, saat, berber) => {
+                const yeni = { id: Date.now(), musteri: "MOLA/İZİN", tip: 'blok', tarih, saat, berber };
+                setRandevular([...randevular, yeni]);
+            };
 
             return (
-                <div className="flex flex-col items-center justify-center min-h-screen p-4">
-                    {/* Üst Kısım */}
-                    <div className="w-full max-w-lg flex justify-end mb-4">
+                <div className="min-h-screen">
+                    {/* Üst Bar */}
+                    <nav className="p-4 flex justify-between items-center glass sticky top-0 z-50 px-8">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 gold-gradient rounded-full flex items-center justify-center text-black font-bold">A</div>
+                            <span className="font-black tracking-tighter text-yellow-500 uppercase italic">Ahmet Tekeli PRO</span>
+                        </div>
                         <button onClick={() => {
-                            const p = prompt("Şifre:");
-                            if(p === "1923") setIsAdmin(!isAdmin);
-                        }} className="bg-white/20 px-4 py-2 rounded-lg text-xs font-bold hover:bg-white/30 transition">
-                            {isAdmin ? "Çıkış Yap" : "Admin Girişi"}
+                            const p = prompt("Yönetici Şifresi:");
+                            if(p === "1923") setView(view === 'admin' ? 'customer' : 'admin');
+                        }} className="text-[10px] border border-yellow-900/50 px-4 py-1 rounded-full hover:bg-yellow-900/20">
+                            {view === 'admin' ? 'ÇIKIŞ' : 'YÖNETİM'}
                         </button>
-                    </div>
+                    </nav>
 
-                    {!isAdmin ? (
-                        /* MÜŞTERİ PANELİ (Görseldeki Tasarım) */
-                        <div className="glass w-full max-w-md rounded-[40px] p-8 shadow-2xl animate-in fade-in zoom-in duration-500">
-                            <div className="text-center mb-6">
-                                <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 border-4 border-yellow-600 flex items-center justify-center overflow-hidden">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/1004/1004611.png" className="w-12 h-12 opacity-80" />
-                                </div>
-                                <h2 className="text-2xl font-black tracking-tight text-white uppercase">Ahmet Tekeli</h2>
-                                <p className="text-gray-300 text-xs font-bold tracking-widest uppercase">Erkek Kuaförü</p>
-                                <p className="text-yellow-500 mt-1 text-sm">★ 4.8 (164)</p>
-                            </div>
-
-                            <form onSubmit={randevuAl} className="space-y-4">
-                                <input name="adSoyad" placeholder="Adınız ve Soyadınız" className="w-full bg-white/10 border border-white/20 p-3 rounded-xl outline-none focus:bg-white/20 transition" required />
-                                <input name="telefon" placeholder="05xxxxxxxxx" type="tel" className="w-full bg-white/10 border border-white/20 p-3 rounded-xl outline-none" required />
+                    {view === 'customer' ? (
+                        /* ================= MÜŞTERİ EKRANI ================= */
+                        <div className="max-w-md mx-auto p-6 mt-10">
+                            <div className="glass rounded-[3rem] p-8 shadow-2xl relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-600/10 blur-3xl rounded-full"></div>
+                                <h2 className="text-2xl font-black mb-6 text-center text-white italic tracking-tighter">RANDEVU OLUŞTUR</h2>
                                 
-                                <div className="grid grid-cols-2 gap-3">
-                                    <select name="berber" onChange={(e)=>setSelectedBerber(e.target.value)} className="bg-white/10 border border-white/20 p-3 rounded-xl outline-none text-sm" required>
-                                        <option value="">Berber Seçin</option>
-                                        {berberler.map(b => <option key={b} value={b} className="text-black">{b}</option>)}
-                                    </select>
-                                    <select name="hizmet" className="bg-white/10 border border-white/20 p-3 rounded-xl outline-none text-sm" required>
-                                        <option value="">İşlem Seçin</option>
-                                        {hizmetler.map(h => <option key={h.ad} value={h.ad} className="text-black">{h.ad} ({h.fiyat}₺)</option>)}
-                                    </select>
-                                </div>
-
-                                <input type="date" onChange={(e)=>setSelectedDate(e.target.value)} className="w-full bg-white/10 border border-white/20 p-3 rounded-xl outline-none" required />
-
-                                {selectedDate && selectedBerber ? (
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-400 uppercase">Uygun Saatler</label>
-                                        <div className="grid grid-cols-4 gap-2">
-                                            {mesaiSaatleri.map(saat => {
-                                                const isDolu = doluSaatler.includes(saat);
-                                                return (
-                                                    <label key={saat} className={`relative cursor-pointer text-center p-2 rounded-lg text-xs font-bold transition ${isDolu ? 'bg-red-900/40 text-gray-500 cursor-not-allowed' : 'bg-green-600/20 hover:bg-green-600/40 text-green-400 border border-green-600/30'}`}>
-                                                        <input type="radio" name="saat" value={saat} disabled={isDolu} className="hidden" required />
-                                                        {saat}
-                                                    </label>
-                                                );
-                                            })}
-                                        </div>
+                                <form onSubmit={randevuAl} className="space-y-4">
+                                    <input name="ad" placeholder="Adınız Soyadınız" className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-yellow-600 transition" required />
+                                    <input name="tel" placeholder="Telefon (05xx)" type="tel" className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none" required />
+                                    
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <select name="berber" className="bg-black border border-white/10 p-4 rounded-2xl outline-none text-sm" required>
+                                            <option value="">Berber Seç</option>
+                                            {berberler.map(b => <option key={b.id} value={b.ad}>{b.ad}</option>)}
+                                        </select>
+                                        <select name="hizmet" className="bg-black border border-white/10 p-4 rounded-2xl outline-none text-sm" required>
+                                            <option value="">Hizmet Seç</option>
+                                            {hizmetler.map(h => <option key={h.id} value={h.ad}>{h.ad} ({h.fiyat}₺)</option>)}
+                                        </select>
                                     </div>
-                                ) : (
-                                    <p className="text-[10px] text-gray-400 italic text-center">Lütfen önce tarih ve berber seçin.</p>
-                                )}
 
-                                <button type="submit" className="gold-btn w-full p-4 rounded-xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition mt-4">Randevu Al</button>
-                            </form>
+                                    <input name="tarih" type="date" className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none" required />
+                                    
+                                    <div className="grid grid-cols-4 gap-2 mt-4">
+                                        {mesaiSaatleri.map(saat => (
+                                            <label key={saat} className="cursor-pointer group">
+                                                <input type="radio" name="saat" value={saat} className="hidden peer" required />
+                                                <div className="bg-white/5 border border-white/10 p-2 rounded-xl text-center text-[10px] font-bold peer-checked:bg-yellow-600 peer-checked:text-black transition">
+                                                    {saat}
+                                                </div>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    <button className="gold-gradient w-full p-5 rounded-3xl text-black font-black uppercase tracking-widest mt-6 shadow-xl shadow-yellow-600/20 active:scale-95 transition">Randevu Al</button>
+                                </form>
+                            </div>
                         </div>
                     ) : (
-                        /* YÖNETİCİ MODU */
-                        <div className="glass w-full max-w-4xl rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-500">
-                            <h2 className="text-xl font-bold text-yellow-500 mb-6 uppercase tracking-tighter">İşletme Yönetimi</h2>
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="space-y-4">
-                                    <h3 className="text-sm font-bold text-blue-400 uppercase">Gelen Randevular</h3>
-                                    {randevular.map(r => (
-                                        <div key={r.id} className="bg-black/40 p-4 rounded-2xl border border-white/10 flex justify-between items-center">
-                                            <div>
-                                                <p className="font-bold">{r.adSoyad}</p>
-                                                <p className="text-[10px] text-gray-400">{r.tarih} | {r.saat} | {r.berber}</p>
+                        /* ================= YÖNETİCİ PANELİ ================= */
+                        <div className="p-4 md:p-8 max-w-6xl mx-auto">
+                            {/* Admin Menu */}
+                            <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
+                                <button onClick={() => setAdminTab('randevular')} className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest ${adminTab === 'randevular' ? 'gold-gradient text-black' : 'glass'}`}>Randevular</button>
+                                <button onClick={() => setAdminTab('hizmetler')} className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest ${adminTab === 'hizmetler' ? 'gold-gradient text-black' : 'glass'}`}>Hizmetler</button>
+                                <button onClick={() => setAdminTab('personel')} className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest ${adminTab === 'personel' ? 'gold-gradient text-black' : 'glass'}`}>Berberler</button>
+                            </div>
+
+                            {/* Randevu Yönetimi ve Mola Ayarı */}
+                            {adminTab === 'randevular' && (
+                                <div className="grid md:grid-cols-3 gap-6">
+                                    <div className="md:col-span-2 space-y-4">
+                                        <h3 className="text-yellow-500 font-black text-sm uppercase italic">Aktif Ajanda</h3>
+                                        {randevular.map(r => (
+                                            <div key={r.id} className={`glass p-5 rounded-3xl flex justify-between items-center ${r.tip === 'blok' ? 'opacity-50 border-dashed border-red-900' : ''}`}>
+                                                <div>
+                                                    <p className="text-xs font-bold text-yellow-600">{r.tarih} | {r.saat}</p>
+                                                    <p className="font-black text-lg">{r.musteri}</p>
+                                                    <p className="text-[10px] text-gray-500">{r.hizmet} - {r.berber}</p>
+                                                </div>
+                                                <button onClick={() => setRandevular(randevular.filter(x => x.id !== r.id))} className="text-red-500 hover:bg-red-500/10 p-3 rounded-full"><i className="fa-solid fa-trash"></i></button>
                                             </div>
-                                            <button onClick={() => setRandevular(randevular.filter(x => x.id !== r.id))} className="text-red-500 hover:scale-110 transition">✕</button>
+                                        ))}
+                                    </div>
+                                    <div className="glass p-6 rounded-[2rem] h-fit">
+                                        <h3 className="text-red-500 font-bold text-xs uppercase mb-4">Mola / İzin Ver</h3>
+                                        <form onSubmit={(e) => {
+                                            e.preventDefault();
+                                            blokla(e.target.t.value, e.target.s.value, e.target.b.value);
+                                        }} className="space-y-3">
+                                            <input name="t" type="date" className="w-full bg-black border border-white/10 p-3 rounded-xl text-xs" required />
+                                            <select name="s" className="w-full bg-black border border-white/10 p-3 rounded-xl text-xs">
+                                                {mesaiSaatleri.map(s => <option key={s}>{s}</option>)}
+                                            </select>
+                                            <select name="b" className="w-full bg-black border border-white/10 p-3 rounded-xl text-xs">
+                                                {berberler.map(b => <option key={b.id}>{b.ad}</option>)}
+                                            </select>
+                                            <button className="w-full bg-red-600 p-3 rounded-xl text-[10px] font-black uppercase">O Saati Kapat</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Hizmet Ekle/Sil */}
+                            {adminTab === 'hizmetler' && (
+                                <div className="max-w-xl mx-auto space-y-4">
+                                    <button onClick={() => {
+                                        const ad = prompt("Hizmet Adı:");
+                                        const fiyat = prompt("Fiyatı:");
+                                        if(ad && fiyat) setHizmetler([...hizmetler, {id: Date.now(), ad, fiyat}]);
+                                    }} className="w-full gold-gradient p-4 rounded-2xl text-black font-bold uppercase text-xs">+ Yeni Hizmet Ekle</button>
+                                    {hizmetler.map(h => (
+                                        <div key={h.id} className="glass p-4 rounded-2xl flex justify-between items-center">
+                                            <span className="font-bold">{h.ad} - <span className="text-green-500">{h.fiyat}₺</span></span>
+                                            <button onClick={() => setHizmetler(hizmetler.filter(x => x.id !== h.id))} className="text-red-500"><i className="fa-solid fa-circle-minus"></i></button>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="bg-black/40 p-6 rounded-2xl border border-white/10 h-fit">
-                                    <h3 className="text-sm font-bold text-green-500 uppercase mb-4 text-center">Günlük Finans Özeti</h3>
-                                    <div className="text-center space-y-2">
-                                        <p className="text-[10px] text-gray-500">Bekleyen Randevu</p>
-                                        <p className="text-3xl font-black">{randevular.length}</p>
-                                        <hr className="border-white/10 my-4" />
-                                        <p className="text-[10px] text-gray-500">Tahmini Ciro</p>
-                                        <p className="text-2xl font-bold text-green-400">₺ {randevular.length * 300}</p>
-                                    </div>
+                            )}
+
+                            {/* Personel Ekle/Sil */}
+                            {adminTab === 'personel' && (
+                                <div className="max-w-xl mx-auto space-y-4">
+                                    <button onClick={() => {
+                                        const ad = prompt("Berber Adı:");
+                                        const uz = prompt("Uzmanlık Alanı:");
+                                        if(ad) setBerberler([...berberler, {id: Date.now(), ad, uzmanlik: uz}]);
+                                    }} className="w-full bg-blue-600 p-4 rounded-2xl text-white font-bold uppercase text-xs">+ Yeni Berber Ekle</button>
+                                    {berberler.map(b => (
+                                        <div key={b.id} className="glass p-4 rounded-2xl flex justify-between items-center">
+                                            <div>
+                                                <p className="font-bold">{b.ad}</p>
+                                                <p className="text-[10px] text-gray-500">{b.uzmanlik}</p>
+                                            </div>
+                                            <button onClick={() => setBerberler(berberler.filter(x => x.id !== b.id))} className="text-red-500"><i className="fa-solid fa-user-xmark"></i></button>
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -165,7 +219,7 @@
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<BarberApp />);
+        root.render(<App />);
     </script>
 </body>
 </html>
