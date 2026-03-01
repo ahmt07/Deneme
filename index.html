@@ -3,109 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Barber Yönetim</title>
+    <title>A-Barber Pro | İşletme Yönetimi</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-black text-gray-100 font-sans">
+<body class="bg-black text-gray-100 italic font-medium">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        function BerberApp() {
-            const [isAdmin, setIsAdmin] = useState(false);
-            const [randevular, setRandevular] = useState([]);
-            const [islemler, setIslemler] = useState([]);
-            const ADMIN_SIFRE = "1923"; // Şifren
+        function BarberPro() {
+            const [view, setView] = useState('customer'); // customer, admin
+            const [tab, setTab] = useState('randevu'); // randevu, stok, finans, ayarlar
+            
+            // --- VERİ YAPILARI ---
+            const [hizmetler, setHizmetler] = useState([
+                { id: 1, ad: 'Saç Kesimi', fiyat: 300, sure: 30 },
+                { id: 2, ad: 'Sakal Tasarım', fiyat: 150, sure: 20 },
+                { id: 3, ad: 'Full Bakım', fiyat: 500, sure: 60 }
+            ]);
 
-            // Verileri yükle
+            const [berberler, setBerberler] = useState([
+                { id: 1, ad: 'Ahmet Usta', uzmanlik: 'Kesim' },
+                { id: 2, ad: 'Mehmet', uzmanlik: 'Sakal & Bakım' }
+            ]);
+
+            const [stok, setStok] = useState([
+                { id: 1, ad: 'Şampuan (5L)', miktar: 3, kritik: 1 },
+                { id: 2, ad: 'Jilet (100lü)', miktar: 10, kritik: 2 }
+            ]);
+
+            const [randevular, setRandevular] = useState([]);
+            const [islemler, setIslemler] = useState([]); // Gelir-Gider
+
+            // --- LOCAL STORAGE ---
             useEffect(() => {
-                setRandevular(JSON.parse(localStorage.getItem('b_randevular')) || []);
-                setIslemler(JSON.parse(localStorage.getItem('b_islemler')) || []);
+                const data = localStorage.getItem('barber_pro_data');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    setRandevular(parsed.randevular || []);
+                    setIslemler(parsed.islemler || []);
+                    setStok(parsed.stok || stok);
+                }
             }, []);
 
-            // Verileri kaydet
             useEffect(() => {
-                localStorage.setItem('b_randevular', JSON.stringify(randevular));
-                localStorage.setItem('b_islemler', JSON.stringify(islemler));
-            }, [randevular, islemler]);
+                localStorage.setItem('barber_pro_data', JSON.stringify({ randevular, islemler, stok }));
+            }, [randevular, islemler, stok]);
 
-            const randevuAl = (e) => {
+            // --- FONKSİYONLAR ---
+            const randevuEkle = (e) => {
                 e.preventDefault();
-                const ad = e.target.ad.value;
-                const saat = e.target.saat.value;
-                setRandevular([...randevular, { id: Date.now(), ad, saat }].sort((a,b) => a.saat.localeCompare(b.saat)));
+                const formData = new FormData(e.target);
+                const yeni = {
+                    id: Date.now(),
+                    musteri: formData.get('musteri'),
+                    telefon: formData.get('telefon'),
+                    berber: formData.get('berber'),
+                    hizmet: formData.get('hizmet'),
+                    tarih: formData.get('tarih'),
+                    saat: formData.get('saat'),
+                    durum: 'bekliyor'
+                };
+                
+                // Saat çakışma kontrolü (Basit)
+                const cakisma = randevular.find(r => r.tarih === yeni.tarih && r.saat === yeni.saat && r.berber === yeni.berber);
+                if(cakisma) return alert("Bu saatte berberimiz dolu!");
+
+                setRandevular([...randevular, yeni]);
+                alert("Randevunuz kaydedildi!");
                 e.target.reset();
-                alert("Randevunuz iletildi!");
             };
 
-            const gelirTop = islemler.filter(i => i.tip === 'gelir').reduce((a, b) => a + Number(b.miktar), 0);
-            const giderTop = islemler.filter(i => i.tip === 'gider').reduce((a, b) => a + Number(b.miktar), 0);
+            const gelirEkle = (r) => {
+                const hizmet = hizmetler.find(h => h.ad === r.hizmet);
+                setIslemler([{ id: Date.now(), baslik: r.musteri + " - " + r.hizmet, miktar: hizmet.fiyat, tip: 'gelir', tarih: new Date().toLocaleDateString() }, ...islemler]);
+                setRandevular(randevular.filter(x => x.id !== r.id));
+            };
 
+            // --- TASARIM BİLEŞENLERİ ---
             return (
-                <div className="p-4 max-w-4xl mx-auto">
-                    {/* LOGO */}
-                    <div className="text-center mb-10 pt-6">
+                <div className="min-h-screen pb-20">
+                    {/* Header */}
+                    <div className="p-6 text-center border-b border-yellow-900/30">
                         <div onClick={() => {
-                            const pw = prompt("Şifre:");
-                            if(pw === ADMIN_SIFRE) setIsAdmin(true);
-                        }} className="w-20 h-20 bg-yellow-600 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold text-black shadow-lg shadow-yellow-600/30 cursor-pointer active:scale-90 transition">A</div>
-                        <h1 className="text-2xl font-black text-yellow-500 uppercase italic tracking-tighter">Premium Barber</h1>
+                            const p = prompt("Yönetici Şifresi:");
+                            if(p === "1923") setView(view === 'admin' ? 'customer' : 'admin');
+                        }} className="w-16 h-16 bg-yellow-600 rounded-full mx-auto mb-2 flex items-center justify-center text-3xl font-bold text-black shadow-lg shadow-yellow-500/20 cursor-pointer">A</div>
+                        <h1 className="text-xl font-black text-yellow-500 uppercase tracking-widest italic">A-BARBER PRO</h1>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest">{view === 'admin' ? 'Yönetici Paneli' : 'Müşteri Randevu Sistemi'}</p>
                     </div>
 
-                    {!isAdmin ? (
-                        /* MÜŞTERİ PANELİ */
-                        <div className="bg-gray-900 p-8 rounded-3xl border border-gray-800 shadow-2xl max-w-md mx-auto">
-                            <h2 className="text-xl font-bold mb-6 text-center text-blue-400">Online Randevu</h2>
-                            <form onSubmit={randevuAl} className="space-y-4">
-                                <input name="ad" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-400" placeholder="Adınız Soyadınız" required />
-                                <input name="saat" type="time" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-400" required />
-                                <button className="w-full bg-blue-600 p-4 rounded-2xl font-black uppercase active:scale-95 transition">Onayla</button>
-                            </form>
+                    {view === 'customer' ? (
+                        /* ================= MÜŞTERİ EKRANI ================= */
+                        <div className="max-w-md mx-auto p-4 space-y-6 animate-in fade-in">
+                            <div className="bg-gray-900/50 p-6 rounded-3xl border border-gray-800 shadow-xl">
+                                <h2 className="text-blue-400 font-bold mb-4 uppercase text-center text-sm tracking-widest"><i className="fa-solid fa-calendar-check mr-2"></i>Hızlı Randevu</h2>
+                                <form onSubmit={randevuEkle} className="space-y-4 text-sm">
+                                    <input name="musteri" placeholder="Adınız Soyadınız" className="w-full bg-black border border-gray-700 p-4 rounded-xl outline-none focus:border-blue-500" required />
+                                    <input name="telefon" placeholder="Telefon Numaranız" type="tel" className="w-full bg-black border border-gray-700 p-4 rounded-xl outline-none" required />
+                                    
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <select name="berber" className="bg-black border border-gray-700 p-4 rounded-xl outline-none">
+                                            {berberler.map(b => <option key={b.id}>{b.ad}</option>)}
+                                        </select>
+                                        <select name="hizmet" className="bg-black border border-gray-700 p-4 rounded-xl outline-none">
+                                            {hizmetler.map(h => <option key={h.id}>{h.ad} ({h.fiyat}₺)</option>)}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input name="tarih" type="date" className="bg-black border border-gray-700 p-4 rounded-xl outline-none" required />
+                                        <input name="saat" type="time" className="bg-black border border-gray-700 p-4 rounded-xl outline-none" required />
+                                    </div>
+                                    
+                                    <button className="w-full bg-blue-600 p-4 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 transition">Randevu Al</button>
+                                </form>
+                            </div>
                         </div>
                     ) : (
-                        /* YÖNETİCİ PANELİ */
-                        <div className="space-y-6">
-                            <div className="flex justify-between items-center bg-yellow-600/10 p-4 rounded-2xl border border-yellow-600/30">
-                                <span className="text-yellow-500 font-bold text-xs uppercase">Yönetici Modu</span>
-                                <button onClick={() => setIsAdmin(false)} className="bg-red-600 px-4 py-1 rounded-xl text-[10px] font-bold">ÇIKIŞ</button>
+                        /* ================= YÖNETİCİ EKRANI ================= */
+                        <div className="max-w-5xl mx-auto p-4 animate-in slide-in-from-bottom">
+                            {/* Admin Nav */}
+                            <div className="flex gap-2 overflow-x-auto mb-6 pb-2">
+                                <button onClick={() => setTab('randevu')} className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase whitespace-nowrap ${tab === 'randevu' ? 'bg-yellow-600 text-black' : 'bg-gray-800'}`}>Randevular</button>
+                                <button onClick={() => setTab('finans')} className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase whitespace-nowrap ${tab === 'finans' ? 'bg-yellow-600 text-black' : 'bg-gray-800'}`}>Kasa & Rapor</button>
+                                <button onClick={() => setTab('stok')} className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase whitespace-nowrap ${tab === 'stok' ? 'bg-yellow-600 text-black' : 'bg-gray-800'}`}>Malzeme Stok</button>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
-                                    <p className="text-[10px] text-gray-500 uppercase italic">Net Kasa</p>
-                                    <p className="text-xl font-bold text-green-500">{gelirTop - giderTop}₺</p>
-                                </div>
-                                <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
-                                    <p className="text-[10px] text-gray-500 uppercase italic">Bekleyen</p>
-                                    <p className="text-xl font-bold text-blue-400">{randevular.length}</p>
-                                </div>
-                            </div>
-
-                            <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xl">
-                                <h3 className="text-xs font-bold mb-4 text-blue-400 uppercase tracking-widest">Randevu Defteri</h3>
-                                <div className="space-y-2">
+                            {tab === 'randevu' && (
+                                <div className="grid gap-4">
+                                    <h3 className="text-yellow-500 text-xs font-bold uppercase tracking-widest"><i className="fa-solid fa-clock mr-2"></i>Bekleyen Müşteriler</h3>
                                     {randevular.map(r => (
-                                        <div key={r.id} className="flex justify-between items-center bg-black p-4 rounded-xl border border-gray-800">
+                                        <div key={r.id} className="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex justify-between items-center shadow-md">
                                             <div>
-                                                <p className="text-blue-400 font-bold text-xs">{r.saat}</p>
-                                                <p className="font-bold uppercase text-sm">{r.ad}</p>
+                                                <p className="text-blue-400 font-bold text-xs">{r.saat} - {r.tarih}</p>
+                                                <p className="font-bold uppercase">{r.musteri}</p>
+                                                <p className="text-[10px] text-gray-500">{r.hizmet} | <span className="text-yellow-600">{r.berber}</span></p>
                                             </div>
-                                            <button onClick={() => {
-                                                const m = prompt("Tutar:", "300");
-                                                if(m) {
-                                                    setIslemler([{id:Date.now(), baslik: r.ad, miktar:m, tip:'gelir'}, ...islemler]);
-                                                    setRandevular(randevular.filter(x => x.id !== r.id));
-                                                }
-                                            }} className="bg-green-600 text-black px-3 py-1 rounded-lg text-[10px] font-bold">TAMAMLA</button>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => gelirEkle(r)} className="bg-green-600/20 text-green-500 p-2 rounded-lg text-[10px] font-bold border border-green-600/30">TAMAMLA</button>
+                                                <button onClick={() => setRandevular(randevular.filter(x => x.id !== r.id))} className="text-red-500 px-2"><i className="fa-solid fa-trash"></i></button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            )}
+
+                            {tab === 'finans' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-green-900/20 border border-green-600/30 p-4 rounded-2xl text-center">
+                                            <p className="text-[10px] uppercase text-green-500">Bugünkü Ciro</p>
+                                            <p className="text-2xl font-black">{islemler.filter(i => i.tip === 'gelir').reduce((a,b)=> a+Number(b.miktar),0)}₺</p>
+                                        </div>
+                                        <div className="bg-red-900/20 border border-red-600/30 p-4 rounded-2xl text-center">
+                                            <p className="text-[10px] uppercase text-red-500">Toplam Gider</p>
+                                            <p className="text-2xl font-black">{islemler.filter(i => i.tip === 'gider').reduce((a,b)=> a+Number(b.miktar),0)}₺</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800">
+                                        <button onClick={() => {
+                                            const m = prompt("Harcama Tutarı:");
+                                            const ad = prompt("Harcama Nedeni:");
+                                            if(m && ad) setIslemler([{id:Date.now(), baslik: ad, miktar: m, tip: 'gider', tarih: new Date().toLocaleDateString()}, ...islemler]);
+                                        }} className="w-full bg-red-600 p-3 rounded-xl font-bold text-xs uppercase mb-4">Yeni Gider Yaz (-)</button>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                                            {islemler.map(i => (
+                                                <div key={i.id} className="flex justify-between text-xs border-b border-gray-800 pb-2">
+                                                    <span>{i.baslik}</span>
+                                                    <span className={i.tip === 'gelir' ? 'text-green-500' : 'text-red-500'}>{i.tip === 'gelir' ? '+' : '-'}{i.miktar}₺</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {tab === 'stok' && (
+                                <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 space-y-4">
+                                    <h3 className="text-yellow-500 text-xs font-bold uppercase tracking-widest">Malzeme Deposu</h3>
+                                    {stok.map(s => (
+                                        <div key={s.id} className="flex justify-between items-center bg-black p-4 rounded-xl">
+                                            <div>
+                                                <p className="font-bold text-sm uppercase">{s.ad}</p>
+                                                <p className={`text-[10px] ${s.miktar <= s.kritik ? 'text-red-500 font-bold animate-pulse' : 'text-gray-500'}`}>Kalan: {s.miktar} Adet</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <button onClick={() => setStok(stok.map(x => x.id === s.id ? {...x, miktar: x.miktar-1} : x))} className="bg-gray-800 px-3 py-1 rounded text-red-500">-</button>
+                                                <button onClick={() => setStok(stok.map(x => x.id === s.id ? {...x, miktar: x.miktar+1} : x))} className="bg-gray-800 px-3 py-1 rounded text-green-500">+</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -113,7 +208,7 @@
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<BerberApp />);
+        root.render(<BarberPro />);
     </script>
 </body>
 </html>
