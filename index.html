@@ -1,183 +1,119 @@
-import React, { useState, useEffect } from 'react';
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Barber Yönetim</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body class="bg-black text-gray-100 font-sans">
+    <div id="root"></div>
 
-const BerberFullSistem = () => {
-  // --- DURUM YÖNETİMİ (STATE) ---
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [randevular, setRandevular] = useState([]);
-  const [islemler, setIslemler] = useState([]);
-  const [hizmetler, setHizmetler] = useState([
-    { id: 1, ad: 'Saç Kesimi', fiyat: 300 },
-    { id: 2, ad: 'Sakal Tıraşı', fiyat: 150 },
-    { id: 3, ad: 'Saç + Sakal', fiyat: 400 },
-    { id: 4, ad: 'Cilt Bakımı', fiyat: 200 }
-  ]);
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  // Şifrenizi buradan değiştirebilirsiniz
-  const ADMIN_SIFRE = "1923"; 
+        function BerberApp() {
+            const [isAdmin, setIsAdmin] = useState(false);
+            const [randevular, setRandevular] = useState([]);
+            const [islemler, setIslemler] = useState([]);
+            const ADMIN_SIFRE = "1923"; // Şifren
 
-  // --- VERİLERİ YÜKLE VE KAYDET (LOCALSTORAGE) ---
-  useEffect(() => {
-    const kRandevular = JSON.parse(localStorage.getItem('b_randevular')) || [];
-    const kIslemler = JSON.parse(localStorage.getItem('b_islemler')) || [];
-    const kHizmetler = JSON.parse(localStorage.getItem('b_hizmetler')) || hizmetler;
-    setRandevular(kRandevular);
-    setIslemler(kIslemler);
-    setHizmetler(kHizmetler);
-  }, []);
+            // Verileri yükle
+            useEffect(() => {
+                setRandevular(JSON.parse(localStorage.getItem('b_randevular')) || []);
+                setIslemler(JSON.parse(localStorage.getItem('b_islemler')) || []);
+            }, []);
 
-  useEffect(() => {
-    localStorage.setItem('b_randevular', JSON.stringify(randevular));
-    localStorage.setItem('b_islemler', JSON.stringify(islemler));
-    localStorage.setItem('b_hizmetler', JSON.stringify(hizmetler));
-  }, [randevular, islemler, hizmetler]);
+            // Verileri kaydet
+            useEffect(() => {
+                localStorage.setItem('b_randevular', JSON.stringify(randevular));
+                localStorage.setItem('b_islemler', JSON.stringify(islemler));
+            }, [randevular, islemler]);
 
-  // --- FONKSİYONLAR ---
-  const musteriRandevuAl = (e) => {
-    e.preventDefault();
-    const ad = e.target.ad.value;
-    const saat = e.target.saat.value;
-    if (!ad || !saat) return;
-    setRandevular([...randevular, { id: Date.now(), ad, saat }].sort((a, b) => a.saat.localeCompare(b.saat)));
-    e.target.reset();
-    alert("Randevunuz başarıyla oluşturuldu!");
-  };
+            const randevuAl = (e) => {
+                e.preventDefault();
+                const ad = e.target.ad.value;
+                const saat = e.target.saat.value;
+                setRandevular([...randevular, { id: Date.now(), ad, saat }].sort((a,b) => a.saat.localeCompare(b.saat)));
+                e.target.reset();
+                alert("Randevunuz iletildi!");
+            };
 
-  const islemEkle = (baslik, miktar, tip) => {
-    setIslemler([{ id: Date.now(), baslik, miktar, tip, tarih: new Date().toLocaleDateString() }, ...islemler]);
-  };
+            const gelirTop = islemler.filter(i => i.tip === 'gelir').reduce((a, b) => a + Number(b.miktar), 0);
+            const giderTop = islemler.filter(i => i.tip === 'gider').reduce((a, b) => a + Number(b.miktar), 0);
 
-  const gelirTop = islemler.filter(i => i.tip === 'gelir').reduce((a, b) => a + Number(b.miktar), 0);
-  const giderTop = islemler.filter(i => i.tip === 'gider').reduce((a, b) => a + Number(b.miktar), 0);
-
-  return (
-    <div className="min-h-screen bg-black text-gray-100 p-4 font-sans">
-      
-      {/* ÜST LOGO ALANI */}
-      <div className="max-w-4xl mx-auto text-center mb-10">
-        <div 
-          onClick={() => {
-            const pw = prompt("Yönetici Şifresi:");
-            if(pw === ADMIN_SIFRE) setIsAdmin(true);
-          }}
-          className="w-20 h-20 bg-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-4xl font-bold shadow-[0_0_20px_rgba(202,138,4,0.4)] cursor-pointer active:scale-90 transition"
-        >
-          A
-        </div>
-        <h1 className="text-2xl font-black text-yellow-500 tracking-tighter uppercase italic">Premium Barber</h1>
-        <p className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">Style & Precision</p>
-      </div>
-
-      <div className="max-w-4xl mx-auto">
-        {!isAdmin ? (
-          /* ================= MÜŞTERİ PANELİ ================= */
-          <div className="max-w-md mx-auto bg-gray-900/50 p-8 rounded-3xl border border-gray-800 shadow-2xl">
-            <h2 className="text-xl font-bold mb-6 text-center text-blue-400 uppercase tracking-tight">Hızlı Randevu Al</h2>
-            <form onSubmit={musteriRandevuAl} className="space-y-4">
-              <input name="ad" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-500 transition text-sm" placeholder="Adınız Soyadınız" required />
-              <input name="saat" type="time" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-500 transition text-sm" required />
-              <button className="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl font-black uppercase tracking-widest transition shadow-lg shadow-blue-600/20 active:scale-95">Randevuyu Onayla</button>
-            </form>
-            <p className="text-center text-[9px] text-gray-600 mt-6 italic">Mesai saatlerimiz dışındaki randevular geçersiz sayılabilir.</p>
-          </div>
-        ) : (
-          /* ================= YÖNETİCİ PANELİ ================= */
-          <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex justify-between items-center bg-yellow-600/10 p-4 rounded-2xl border border-yellow-600/30">
-              <div className="text-xs">
-                <p className="text-yellow-500 font-bold uppercase tracking-widest">Yönetici Modu</p>
-                <p className="text-gray-400">Hoş geldin, Patron.</p>
-              </div>
-              <button onClick={() => setIsAdmin(false)} className="bg-red-900/40 text-red-500 border border-red-900 px-4 py-2 rounded-xl text-xs font-black hover:bg-red-900/60 transition">ÇIKIŞ YAP</button>
-            </div>
-
-            {/* İSTATİSTİKLER */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
-                <p className="text-[9px] text-gray-500 uppercase">Kasa (Net)</p>
-                <p className="text-xl font-bold text-green-500">{gelirTop - giderTop}₺</p>
-              </div>
-              <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
-                <p className="text-[9px] text-gray-500 uppercase">Randevu</p>
-                <p className="text-xl font-bold text-blue-400">{randevular.length}</p>
-              </div>
-              <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
-                <p className="text-[9px] text-gray-500 uppercase">Gider</p>
-                <p className="text-xl font-bold text-red-500">{giderTop}₺</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* RANDEVULAR */}
-              <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xl">
-                <h3 className="text-sm font-bold mb-4 text-blue-400 uppercase tracking-widest">Gelecek Randevular</h3>
-                <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-                  {randevular.length === 0 && <p className="text-gray-600 text-xs italic">Şu an randevu yok.</p>}
-                  {randevular.map(r => (
-                    <div key={r.id} className="flex justify-between items-center bg-black p-4 rounded-2xl border border-gray-800">
-                      <div>
-                        <p className="text-blue-400 font-bold text-xs">{r.saat}</p>
-                        <p className="font-bold uppercase text-sm">{r.ad}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => {
-                          const f = prompt("Ücret Girin:", "300");
-                          if(f) { islemEkle(r.ad + " Tıraşı", f, 'gelir'); setRandevular(randevular.filter(x => x.id !== r.id)); }
-                        }} className="text-green-500 text-[10px] font-bold border border-green-900 px-2 py-1 rounded">ONAYLA</button>
-                        <button onClick={() => setRandevular(randevular.filter(x => x.id !== r.id))} className="text-red-500 font-bold text-xs px-2">×</button>
-                      </div>
+            return (
+                <div className="p-4 max-w-4xl mx-auto">
+                    {/* LOGO */}
+                    <div className="text-center mb-10 pt-6">
+                        <div onClick={() => {
+                            const pw = prompt("Şifre:");
+                            if(pw === ADMIN_SIFRE) setIsAdmin(true);
+                        }} className="w-20 h-20 bg-yellow-600 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-bold text-black shadow-lg shadow-yellow-600/30 cursor-pointer active:scale-90 transition">A</div>
+                        <h1 className="text-2xl font-black text-yellow-500 uppercase italic tracking-tighter">Premium Barber</h1>
                     </div>
-                  ))}
+
+                    {!isAdmin ? (
+                        /* MÜŞTERİ PANELİ */
+                        <div className="bg-gray-900 p-8 rounded-3xl border border-gray-800 shadow-2xl max-w-md mx-auto">
+                            <h2 className="text-xl font-bold mb-6 text-center text-blue-400">Online Randevu</h2>
+                            <form onSubmit={randevuAl} className="space-y-4">
+                                <input name="ad" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-400" placeholder="Adınız Soyadınız" required />
+                                <input name="saat" type="time" className="w-full bg-black border border-gray-700 p-4 rounded-2xl outline-none focus:border-blue-400" required />
+                                <button className="w-full bg-blue-600 p-4 rounded-2xl font-black uppercase active:scale-95 transition">Onayla</button>
+                            </form>
+                        </div>
+                    ) : (
+                        /* YÖNETİCİ PANELİ */
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center bg-yellow-600/10 p-4 rounded-2xl border border-yellow-600/30">
+                                <span className="text-yellow-500 font-bold text-xs uppercase">Yönetici Modu</span>
+                                <button onClick={() => setIsAdmin(false)} className="bg-red-600 px-4 py-1 rounded-xl text-[10px] font-bold">ÇIKIŞ</button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
+                                    <p className="text-[10px] text-gray-500 uppercase italic">Net Kasa</p>
+                                    <p className="text-xl font-bold text-green-500">{gelirTop - giderTop}₺</p>
+                                </div>
+                                <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center">
+                                    <p className="text-[10px] text-gray-500 uppercase italic">Bekleyen</p>
+                                    <p className="text-xl font-bold text-blue-400">{randevular.length}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xl">
+                                <h3 className="text-xs font-bold mb-4 text-blue-400 uppercase tracking-widest">Randevu Defteri</h3>
+                                <div className="space-y-2">
+                                    {randevular.map(r => (
+                                        <div key={r.id} className="flex justify-between items-center bg-black p-4 rounded-xl border border-gray-800">
+                                            <div>
+                                                <p className="text-blue-400 font-bold text-xs">{r.saat}</p>
+                                                <p className="font-bold uppercase text-sm">{r.ad}</p>
+                                            </div>
+                                            <button onClick={() => {
+                                                const m = prompt("Tutar:", "300");
+                                                if(m) {
+                                                    setIslemler([{id:Date.now(), baslik: r.ad, miktar:m, tip:'gelir'}, ...islemler]);
+                                                    setRandevular(randevular.filter(x => x.id !== r.id));
+                                                }
+                                            }} className="bg-green-600 text-black px-3 py-1 rounded-lg text-[10px] font-bold">TAMAMLA</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-              </div>
+            );
+        }
 
-              {/* KASA HIZLI GİRİŞ */}
-              <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xl">
-                <h3 className="text-sm font-bold mb-4 text-green-500 uppercase tracking-widest">Hızlı Kasa</h3>
-                <div className="space-y-2 mb-4">
-                  {hizmetler.map(h => (
-                    <button 
-                      key={h.id} 
-                      onClick={() => islemEkle(h.ad, h.fiyat, 'gelir')}
-                      className="w-full flex justify-between bg-black p-3 rounded-xl border border-gray-800 hover:border-yellow-600 transition text-sm text-left"
-                    >
-                      <span>{h.ad}</span>
-                      <span className="font-bold text-yellow-500">{h.fiyat}₺</span>
-                    </button>
-                  ))}
-                </div>
-                <button 
-                  onClick={() => {
-                    const ad = prompt("Harcama Adı:");
-                    const m = prompt("Miktar:");
-                    if(ad && m) islemEkle(ad, m, 'gider');
-                  }}
-                  className="w-full border-2 border-dashed border-red-900/50 p-3 rounded-xl text-red-500 text-[10px] font-bold uppercase hover:bg-red-900/10 transition"
-                >
-                  - Harcama/Gider Ekle
-                </button>
-              </div>
-            </div>
-
-            {/* HİZMET YÖNETİMİ & GEÇMİŞ */}
-            <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800">
-              <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 tracking-widest">Kasa Geçmişi</h3>
-              <div className="max-h-40 overflow-y-auto space-y-2">
-                {islemler.map(i => (
-                  <div key={i.id} className="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
-                    <span className="text-gray-300">{i.baslik} <span className="text-[10px] text-gray-600">({i.tarih})</span></span>
-                    <div className="flex gap-4">
-                      <span className={i.tip === 'gelir' ? 'text-green-500' : 'text-red-500'}>{i.tip === 'gelir' ? '+' : '-'}{i.miktar}₺</span>
-                      <button onClick={() => setIslemler(islemler.filter(x => x.id !== i.id))} className="text-gray-700">×</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default BerberFullSistem;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<BerberApp />);
+    </script>
+</body>
+</html>
