@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ahmet Tekeli KASA - V24</title>
+    <title>Ahmet Tekeli KASA - V24 Arşivli</title>
     
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
@@ -31,7 +31,7 @@
     
     <div id="giderModal" class="modal-overlay"><div class="modal-icerik shadow-2xl border border-slate-200 text-[9px]"><div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="font-black uppercase text-red-800">DÜKKAN GİDERLERİ</h2><button onclick="document.getElementById('giderModal').style.display='none'" class="text-red-500 font-black px-2 py-1 rounded-lg uppercase">Kapat</button></div><div class="bg-red-50 p-2 rounded-xl mb-3"><input type="text" id="gAd" placeholder="Gider Adı" class="w-full p-2 mb-2 rounded-lg border-none font-bold text-[10px]"><div class="flex gap-1"><input type="number" id="gTutar" placeholder="₺ Tutar" class="w-1/2 p-2 rounded-lg border-none font-black text-red-600"><button onclick="giderPanelEkle()" class="w-1/2 bg-red-600 text-white rounded-lg font-bold uppercase">KAYDET</button></div></div><input type="text" id="gAra" onkeyup="giderPanelListele()" placeholder="Gider Ara..." class="w-full p-2 mb-2 border rounded-lg font-bold"><div id="giderPanelListesi" class="space-y-2 overflow-y-auto max-h-60"></div></div></div>
     
-    <div id="raporModal" class="modal-overlay"><div class="modal-icerik shadow-2xl border border-slate-200"><div class="flex justify-between items-center mb-4 border-b pb-2 no-print"><h2 class="text-sm font-black text-blue-800 uppercase italic">Günlük Personel Raporu</h2><div class="flex gap-1"><button onclick="window.print()" class="text-blue-600 font-black text-[9px] border border-blue-200 px-2 py-1 rounded-lg">YAZDIR</button><button onclick="document.getElementById('raporModal').style.display='none'" class="text-red-500 font-black text-[10px] border border-red-200 px-2 py-1 rounded-lg">KAPAT</button></div></div><div id="raporData" class="space-y-4"></div></div></div>
+    <div id="raporModal" class="modal-overlay"><div class="modal-icerik shadow-2xl border border-slate-200"><div class="flex justify-between items-center mb-4 border-b pb-2 no-print"><h2 class="text-sm font-black text-blue-800 uppercase italic">GÜNLÜK VE AYLIK DÖKÜM</h2><div class="flex gap-1"><button onclick="window.print()" class="text-blue-600 font-black text-[9px] border border-blue-200 px-2 py-1 rounded-lg">YAZDIR</button><button onclick="document.getElementById('raporModal').style.display='none'" class="text-red-500 font-black text-[10px] border border-red-200 px-2 py-1 rounded-lg">KAPAT</button></div></div><div id="raporData" class="space-y-4"></div></div></div>
 
     <div class="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-2xl p-4 min-h-[95vh] flex flex-col border border-slate-100">
         <div class="flex justify-between items-center mb-2 px-1">
@@ -83,17 +83,13 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2 mb-2 text-[7px]">
-            <div class="bg-orange-50 p-2 rounded-xl border border-orange-200">
-                <p class="font-black text-orange-600 uppercase text-center border-b mb-1">ERCAN (%50)</p>
-                <div class="flex flex-col gap-0.5 font-bold text-slate-600 text-center">
-                    İŞ: <span id="eToplamIs">0</span> | PAY: <span id="pErcan">0</span>
-                </div>
+            <div class="bg-orange-50 p-2 rounded-xl border border-orange-200 text-center">
+                <p class="font-black text-orange-600 uppercase border-b mb-1">ERCAN (%50)</p>
+                İŞ: <span id="eToplamIs">0</span> | PAY: <span id="pErcan">0</span>
             </div>
-            <div class="bg-purple-50 p-2 rounded-xl border border-purple-200">
-                <p class="font-black text-purple-600 uppercase text-center border-b mb-1">EFE (%30)</p>
-                <div class="flex flex-col gap-0.5 font-bold text-slate-600 text-center">
-                    İŞ: <span id="fToplamIs">0</span> | PAY: <span id="fPay">0</span>
-                </div>
+            <div class="bg-purple-50 p-2 rounded-xl border border-purple-200 text-center">
+                <p class="font-black text-purple-600 uppercase border-b mb-1">EFE (%30)</p>
+                İŞ: <span id="fToplamIs">0</span> | PAY: <span id="fPay">0</span>
             </div>
         </div>
 
@@ -114,7 +110,7 @@
 
         <div onclick="raporUret()" class="mt-2 bg-blue-600 text-white py-1.5 rounded-xl text-center shadow-md cursor-pointer border-2 border-blue-400">
             <h2 id="aylikCiro" class="text-sm font-black italic">0 ₺</h2>
-            <p class="text-[6px] font-bold uppercase opacity-80 mt-0.5 tracking-tighter italic">PERSONEL BAZLI RAPORU GÖR</p>
+            <p class="text-[6px] font-bold uppercase opacity-80 mt-0.5 tracking-tighter italic">DETAYLI ARŞİV VE RAPORLARI GÖR</p>
         </div>
     </div>
 
@@ -125,6 +121,7 @@
         let p = 'ahmet'; let hesaplanmisNet = 0; let sonKasaVerisi = null;
         const simdi = new Date();
         const ayID = simdi.getFullYear() + "-" + (simdi.getMonth() + 1);
+        const gunID = simdi.toISOString().split('T')[0];
         document.getElementById('bugunTarih').innerText = simdi.toLocaleDateString('tr-TR', { day:'2-digit', month:'long', year:'numeric' });
 
         function pSec(sec) { p = sec; document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active-p')); document.getElementById('btn' + sec).classList.add('active-p'); }
@@ -137,103 +134,102 @@
             document.getElementById('h').value = ''; document.getElementById('t').value = '';
         }
 
-        // VERESİYE VE GİDER FONKSİYONLARI
+        // VERESİYE
         function veresiyeEkle() { const m = document.getElementById('vMusteri').value; const t = parseFloat(document.getElementById('vTutar').value); if(!m || isNaN(t)) return; db.ref('veresiye/').push({ m, t, tarih: new Date().toLocaleDateString('tr-TR') }); document.getElementById('vMusteri').value = ''; document.getElementById('vTutar').value = ''; }
-        function veresiyeListele() { const ara = document.getElementById('vAra').value.toLowerCase(); db.ref('veresiye/').on('value', (snap) => { const liste = document.getElementById('veresiyeListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.m.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-slate-50 border rounded-lg mb-1"><div class="flex flex-col"><span class="font-black text-blue-900 uppercase">${v.m}</span><span class="text-[7px] text-slate-400">${v.tarih}</span></div><div class="flex items-center gap-2"><span class="font-black text-blue-600">${v.t} ₺</span><button onclick="veresiyeTahsilEt('${key}', '${v.m}', ${v.t})" class="bg-emerald-500 text-white px-2 py-1 rounded text-[8px] font-bold">ALINDI</button></div></div>`; } }); } }); }
-        function veresiyeTahsilEt(id, musteri, tutar) { if(confirm(musteri + " tahsilatı işlensin mi?")) { db.ref('kasa/').push({ h: musteri + " (Veresiye)", t: tutar, y: 'Nakit', p: 'ahmet', saat: 'Tahsilat' }); db.ref('veresiye/' + id).remove(); } }
-        function giderPanelEkle() { const ad = document.getElementById('gAd').value; const t = parseFloat(document.getElementById('gTutar').value); if(!ad || isNaN(t)) return; db.ref('kasa/').push({ h: ad, t: t, y: 'Nakit', p: 'Gider', saat: 'Masraf' }); document.getElementById('gAd').value = ''; document.getElementById('gTutar').value = ''; }
+        function veresiyeListele() { const ara = document.getElementById('vAra').value.toLowerCase(); db.ref('veresiye/').on('value', (snap) => { const liste = document.getElementById('veresiyeListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.m.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-slate-50 border rounded-lg mb-1"><span class="font-black text-blue-900 uppercase">${v.m}</span><div class="flex items-center gap-2"><span class="font-black text-blue-600">${v.t} ₺</span><button onclick="veresiyeTahsilEt('${key}', '${v.m}', ${v.t})" class="bg-emerald-500 text-white px-2 py-1 rounded text-[8px] font-bold uppercase">ALINDI</button></div></div>`; } }); } }); }
+        function veresiyeTahsilEt(id, musteri, tutar) { if(confirm(musteri + " tahsil edildi mi?")) { db.ref('kasa/').push({ h: musteri + " (Veresiye)", t: tutar, y: 'Nakit', p: 'ahmet', saat: 'Tahsilat' }); db.ref('veresiye/' + id).remove(); } }
+
+        // GİDERLER (AYLIK TAKİP EKLENDİ)
+        function giderPanelEkle() { 
+            const ad = document.getElementById('gAd').value; const t = parseFloat(document.getElementById('gTutar').value); 
+            if(!ad || isNaN(t)) return; 
+            db.ref('kasa/').push({ h: ad, t: t, y: 'Nakit', p: 'Gider', saat: 'Masraf' }); 
+            db.ref('aylikGider/' + ayID).push({ ad, t, tarih: gunID });
+            document.getElementById('gAd').value = ''; document.getElementById('gTutar').value = ''; 
+        }
         function giderPanelListele() { const ara = document.getElementById('gAra').value.toLowerCase(); db.ref('kasa/').on('value', (snap) => { const liste = document.getElementById('giderPanelListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.p === 'Gider' && v.h.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-red-50 border border-red-100 rounded-lg mb-1"><span><b>${v.h.toUpperCase()}</b></span><span class="font-black text-red-600">${v.t} ₺</span></div>`; } }); } }); }
         
         veresiyeListele(); giderPanelListele();
 
-        // ANA HESAPLAMA MOTORU
+        // HESAP MOTORU
         db.ref('kasa/').on('value', (snapshot) => {
             const veriler = snapshot.val(); sonKasaVerisi = veriler;
             const listDiv = document.getElementById('islemListesi'); listDiv.innerHTML = "";
             let tC=0, gT=0; let yOzet = { Nakit:0, Kart:0, Iban:0 };
             let pToplam = { ahmet:0, Ercan:0, Efe:0, Turancan:0, Bekir:0 };
-            
             if (veriler) {
                 Object.keys(veriler).reverse().forEach(key => {
                     const v = veriler[key]; const t = parseFloat(v.t);
-                    listDiv.innerHTML += `<div class="islem-row flex justify-between items-center p-1.5 border-b"><span><b>${v.p}:</b> ${v.h} (${v.y})</span><div class="flex items-center gap-2"><span class="font-black">${t} ₺</span><button onclick="kayitSil('${key}')" class="text-red-300 px-1"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
-                    
+                    listDiv.innerHTML += `<div class="islem-row flex justify-between items-center p-1.5 border-b"><span><b>${v.p}:</b> ${v.h}</span><div class="flex items-center gap-2"><span class="font-black">${t} ₺</span><button onclick="kayitSil('${key}')" class="text-red-300 px-1"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
                     if (v.p === 'Gider') { gT += t; } 
-                    else { 
-                        tC += t; 
-                        if(yOzet[v.y] !== undefined) yOzet[v.y] += t;
-                        if(pToplam.hasOwnProperty(v.p)) pToplam[v.p] += t;
+                    else { tC += t; if(yOzet[v.y] !== undefined) yOzet[v.y] += t; if(pToplam.hasOwnProperty(v.p)) pToplam[v.p] += t; }
+                });
+            }
+            const eP = Math.floor(pToplam.Ercan * 0.5); const fP = Math.floor(pToplam.Efe * 0.3);
+            hesaplanmisNet = Math.floor(tC - (eP + fP + gT));
+            document.getElementById('yNakit').innerText = yOzet.Nakit; document.getElementById('yKart').innerText = yOzet.Kart; document.getElementById('yIban').innerText = yOzet.Iban;
+            document.getElementById('eToplamIs').innerText = pToplam.Ercan; document.getElementById('fToplamIs').innerText = pToplam.Efe;
+            document.getElementById('pErcan').innerText = eP; document.getElementById('fPay').innerText = fP;
+            document.getElementById('cToplam').innerText = tC + " ₺"; document.getElementById('gToplam').innerText = gT + " ₺";
+            document.getElementById('netKalan').innerText = hesaplanmisNet + " ₺";
+        });
+
+        // ARŞİVLİ RAPOR ÜRETME
+        async function raporUret() {
+            let html = `<div class="text-center font-black border-b pb-2 text-[10px] uppercase italic mb-4">PERSONEL GÜNLÜK İŞ LİSTESİ</div>`;
+            if(sonKasaVerisi) {
+                const personeller = ['ahmet', 'Ercan', 'Efe', 'Turancan', 'Bekir', 'Gider'];
+                let raporGruplari = {};
+                personeller.forEach(p => raporGruplari[p] = { liste: "", toplam: 0 });
+                Object.values(sonKasaVerisi).forEach(v => {
+                    const t = parseFloat(v.t);
+                    let satir = `<div class="flex justify-between border-b border-gray-50 py-1 text-[7px]"><span>${v.saat} | ${v.h}</span><span class="font-bold">${t} ₺</span></div>`;
+                    if(raporGruplari[v.p]) { raporGruplari[v.p].liste += satir; raporGruplari[v.p].toplam += t; }
+                });
+                personeller.forEach(p => {
+                    if(raporGruplari[p].toplam > 0) {
+                        let color = p === 'Gider' ? 'red' : 'blue';
+                        html += `<div class="mb-3 border border-${color}-100 rounded-xl overflow-hidden shadow-sm"><div class="bg-${color}-50 px-2 py-1 flex justify-between items-center border-b border-${color}-100"><span class="font-black text-${color}-800 uppercase italic">${p}</span><span class="font-black text-${color}-800">${raporGruplari[p].toplam} ₺</span></div><div class="p-2 bg-white">${raporGruplari[p].liste}</div></div>`;
                     }
                 });
             }
 
-            const eP = Math.floor(pToplam.Ercan * 0.5); const fP = Math.floor(pToplam.Efe * 0.3);
-            hesaplanmisNet = Math.floor(tC - (eP + fP + gT));
-
-            document.getElementById('yNakit').innerText = yOzet.Nakit;
-            document.getElementById('yKart').innerText = yOzet.Kart;
-            document.getElementById('yIban').innerText = yOzet.Iban;
-            document.getElementById('eToplamIs').innerText = pToplam.Ercan;
-            document.getElementById('fToplamIs').innerText = pToplam.Efe;
-            document.getElementById('pErcan').innerText = eP;
-            document.getElementById('fPay').innerText = fP;
-            document.getElementById('cToplam').innerText = tC + " ₺";
-            document.getElementById('gToplam').innerText = gT + " ₺";
-            document.getElementById('netKalan').innerText = hesaplanmisNet + " ₺";
-        });
-
-        // PERSONEL BAZLI RAPOR ÜRETME (İSTEDİĞİN GÜNCELLEME)
-        function raporUret() {
-            if(!sonKasaVerisi) return;
-            const personeller = ['ahmet', 'Ercan', 'Efe', 'Turancan', 'Bekir', 'Gider'];
-            let raporGruplari = {};
-            personeller.forEach(p => raporGruplari[p] = { liste: "", toplam: 0 });
-
-            let gCiro = 0, gGider = 0;
-            Object.values(sonKasaVerisi).forEach(v => {
-                const t = parseFloat(v.t);
-                let satir = `<div class="flex justify-between border-b border-gray-50 py-1 text-[7px]"><span>${v.saat} | ${v.h} (${v.y})</span><span class="font-bold">${t} ₺</span></div>`;
-                if(raporGruplari[v.p]) {
-                    raporGruplari[v.p].liste += satir;
-                    raporGruplari[v.p].toplam += t;
-                }
-                if(v.p === 'Gider') gGider += t; else gCiro += t;
-            });
-
-            const eP = Math.floor(raporGruplari.Ercan.toplam * 0.5);
-            const fP = Math.floor(raporGruplari.Efe.toplam * 0.3);
-            const net = Math.floor(gCiro - (eP + fP + gGider));
-
-            let html = `<div class="text-center font-black border-b pb-2 text-[10px] uppercase italic mb-4">PERSONEL GÜNLÜK İŞ LİSTESİ</div>`;
-            personeller.forEach(p => {
-                if(raporGruplari[p].toplam > 0) {
-                    let color = p === 'Gider' ? 'red' : 'blue';
-                    html += `<div class="mb-3 border border-${color}-100 rounded-xl overflow-hidden shadow-sm">
-                                <div class="bg-${color}-50 px-2 py-1 flex justify-between items-center border-b border-${color}-100">
-                                    <span class="font-black text-${color}-800 uppercase italic">${p}</span>
-                                    <span class="font-black text-${color}-800">${raporGruplari[p].toplam} ₺</span>
-                                </div>
-                                <div class="p-2 bg-white">${raporGruplari[p].liste}</div>
-                             </div>`;
-                }
-            });
-
-            html += `<div class="bg-slate-900 text-white p-3 rounded-2xl font-bold text-[8px] space-y-1 mt-4">
-                        <div class="flex justify-between text-orange-400"><span>ERCAN PAY (%50):</span><span>${eP} ₺</span></div>
-                        <div class="flex justify-between text-purple-400"><span>EFE PAY (%30):</span><span>${fP} ₺</span></div>
-                        <div class="flex justify-between border-t border-white/20 pt-1"><span>TOPLAM CİRO:</span><span>${gCiro} ₺</span></div>
-                        <div class="flex justify-between text-red-400"><span>TOPLAM GİDER:</span><span>${gGider} ₺</span></div>
-                        <div class="flex justify-between border-t border-white/40 pt-1 text-sm font-black text-emerald-400"><span>NET KAZANÇ:</span><span>${net} ₺</span></div>
-                    </div>`;
-
+            // Aylık Giderleri Çek
+            const giderSnap = await db.ref('aylikGider/' + ayID).once('value');
+            let gListHTML = ""; let gAylikToplam = 0;
+            if(giderSnap.val()) {
+                Object.values(giderSnap.val()).forEach(g => {
+                    gListHTML += `<div class="flex justify-between text-[7px] border-b py-1"><span>${g.tarih} | ${g.ad}</span><span class="font-bold text-red-600">-${g.t} ₺</span></div>`;
+                    gAylikToplam += parseFloat(g.t);
+                });
+            }
+            html += `<div class="mt-6 border-t pt-4"><div class="text-center font-black text-red-800 uppercase mb-2">BU AYIN TOPLAM GİDERLERİ</div><div class="p-2 bg-red-50 rounded-xl border border-red-100">${gListHTML || "Gider kaydı yok"}</div><div class="text-right font-black text-red-700 p-2 uppercase">AYLIK TOPLAM GİDER: ${gAylikToplam} ₺</div></div>`;
+            
             document.getElementById('raporData').innerHTML = html;
             document.getElementById('raporModal').style.display = 'flex';
         }
 
         function kayitSil(id) { if(confirm("Siliyorum abi?")) db.ref('kasa/' + id).remove(); }
         db.ref('aylikNet/' + ayID).on('value', (snapshot) => { document.getElementById('aylikCiro').innerText = Math.floor(snapshot.val() || 0).toLocaleString('tr-TR') + " ₺"; });
-        function kasaSifirla() { if(confirm("Günü kapatıyorsun abi?")) { db.ref('aylikNet/' + ayID).transaction(curr => (curr || 0) + hesaplanmisNet); db.ref('kasa/').remove(); } }
-        function aySifirla() { if(confirm("Ayı sıfırla?")) db.ref('aylikNet/' + ayID).set(0); }
+
+        // GÜNÜ KAPAT VE ARŞİVLE
+        function kasaSifirla() {
+            if(confirm("Günü kapatıp arşive kaydediyorum abi?")) {
+                if(sonKasaVerisi) {
+                    db.ref('arsiv/' + gunID).set(sonKasaVerisi); // Tüm işlemleri arşive at
+                }
+                db.ref('aylikNet/' + ayID).transaction(curr => (curr || 0) + hesaplanmisNet);
+                db.ref('kasa/').remove();
+            }
+        }
+
+        // AYI SIFIRLA (NET KÂR VE GİDERLERİ SİLER)
+        function aySifirla() {
+            if(confirm("DİKKAT! Bu ayın tüm cirosunu ve gider geçmişini siliyorum?")) {
+                db.ref('aylikNet/' + ayID).set(0);
+                db.ref('aylikGider/' + ayID).remove();
+            }
+        }
     </script>
 </body>
 </html>
