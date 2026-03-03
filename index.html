@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ahmet Tekeli KASA - V27 Arşivli</title>
+    <title>Ahmet Tekeli KASA - V28 Detaylı Özet</title>
     
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
@@ -98,11 +98,13 @@
         <div class="grid grid-cols-2 gap-2 mb-2">
             <div class="bg-orange-50 p-3 rounded-2xl border-2 border-orange-200 text-center shadow-sm" onclick="pPanelAc('Ercan')">
                 <p class="font-black text-orange-800 uppercase border-b border-orange-200 mb-1 text-[11px]">ERCAN (%50)</p>
-                <div class="font-black text-slate-800 text-[10px]">İŞ: <span id="eToplamIs">0</span> | PAY: <span id="pErcan">0</span></div>
+                <div class="font-black text-slate-800 text-[10px] mb-1">İŞ: <span id="eToplamIs">0</span> | PAY: <span id="pErcan">0</span></div>
+                <div class="text-[8px] font-bold text-slate-500 leading-tight">N:<span id="eN">0</span> K:<span id="eK">0</span> I:<span id="eI">0</span></div>
             </div>
             <div class="bg-purple-50 p-3 rounded-2xl border-2 border-purple-200 text-center shadow-sm" onclick="pPanelAc('Efe')">
                 <p class="font-black text-purple-800 uppercase border-b border-purple-200 mb-1 text-[11px]">EFE (%30)</p>
-                <div class="font-black text-slate-800 text-[10px]">İŞ: <span id="fToplamIs">0</span> | PAY: <span id="fPay">0</span></div>
+                <div class="font-black text-slate-800 text-[10px] mb-1">İŞ: <span id="fToplamIs">0</span> | PAY: <span id="fPay">0</span></div>
+                <div class="text-[8px] font-bold text-slate-500 leading-tight">N:<span id="fN">0</span> K:<span id="fK">0</span> I:<span id="fI">0</span></div>
             </div>
         </div>
 
@@ -165,7 +167,7 @@
         }
 
         function veresiyeEkle() { const m = document.getElementById('vMusteri').value; const t = parseFloat(document.getElementById('vTutar').value); if(!m || isNaN(t)) return; db.ref('veresiye/').push({ m, t, tarih: new Date().toLocaleDateString('tr-TR') }); document.getElementById('vMusteri').value = ''; document.getElementById('vTutar').value = ''; }
-        function veresiyeListele() { const ara = document.getElementById('vAra').value.toLowerCase(); db.ref('veresiye/').on('value', (snap) => { const liste = document.getElementById('veresiyeListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.m.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-slate-50 border rounded-lg mb-1"><span class="font-black text-blue-900 uppercase">${v.m}</span><div class="flex items-center gap-2"><span class="font-black text-blue-600">${v.t} ₺</span><button onclick="veresiyeTahsilEt('${key}', '${v.m}', ${v.t})" class="bg-emerald-500 text-white px-2 py-1 rounded text-[9px] font-bold uppercase">ALINDI</button></div></div>`; } }); } }); }
+        function veresiyeListele() { const ara = document.getElementById('vAra').value.toLowerCase(); db.ref('veresiye/').on('value', (snap) => { const liste = document.getElementById('veresiyeListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.m.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-slate-50 border rounded-lg mb-1"><span class="font-black text-blue-900 uppercase">${v.m}</span><div class="flex items-center gap-2"><span class="font-black text-blue-600">${v.t} ₺</span><button onclick="veresiyeTahsilEt('${key}', '${v.m}', ${v.t})" class="bg-emerald-500 text-white px-2 py-1 rounded text-[8px] font-bold uppercase">ALINDI</button></div></div>`; } }); } }); }
         function veresiyeTahsilEt(id, musteri, tutar) { if(confirm(musteri + " tahsil edildi mi?")) { db.ref('kasa/').push({ h: musteri + " (Veresiye)", t: tutar, y: 'Nakit', p: 'ahmet', saat: 'Tahsilat' }); db.ref('veresiye/' + id).remove(); } }
         function giderPanelEkle() { const ad = document.getElementById('gAd').value; const t = parseFloat(document.getElementById('gTutar').value); if(!ad || isNaN(t)) return; db.ref('kasa/').push({ h: ad, t: t, y: 'Nakit', p: 'Gider', saat: 'Masraf' }); db.ref('aylikGider/' + ayID).push({ ad, t, tarih: gunID }); document.getElementById('gAd').value = ''; document.getElementById('gTutar').value = ''; }
         function giderPanelListele() { const ara = document.getElementById('gAra').value.toLowerCase(); db.ref('kasa/').on('value', (snap) => { const liste = document.getElementById('giderPanelListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.p === 'Gider' && v.h.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-red-50 border border-red-100 rounded-lg mb-1"><span><b>${v.h.toUpperCase()}</b></span><span class="font-black text-red-600">${v.t} ₺</span></div>`; } }); } }); }
@@ -176,20 +178,41 @@
             const veriler = snapshot.val(); sonKasaVerisi = veriler;
             const listDiv = document.getElementById('islemListesi'); listDiv.innerHTML = "";
             let tC=0, gT=0; let yOzet = { Nakit:0, Kart:0, Iban:0 };
-            let pOzet = { Ercan: 0, Efe: 0, ahmet: 0, Turancan: 0, Bekir: 0 };
+            let pOzet = { 
+                Ercan: { t:0, n:0, k:0, i:0 }, 
+                Efe: { t:0, n:0, k:0, i:0 }, 
+                ahmet: 0, Turancan: 0, Bekir: 0 
+            };
             if (veriler) {
                 Object.keys(veriler).reverse().forEach(key => {
                     const v = veriler[key]; const t = parseFloat(v.t);
                     listDiv.innerHTML += `<div class="islem-row flex justify-between items-center p-2 border-b"><span><b class="uppercase">${v.p}:</b> ${v.h}</span><div class="flex items-center gap-2"><span class="font-black text-slate-900">${t} ₺</span><button onclick="kayitSil('${key}')" class="text-red-400 px-1"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
                     if (v.p === 'Gider') { gT += t; } 
-                    else { tC += t; if(yOzet[v.y] !== undefined) yOzet[v.y] += t; if(pOzet.hasOwnProperty(v.p)) pOzet[v.p] += t; }
+                    else { 
+                        tC += t; 
+                        if(yOzet[v.y] !== undefined) yOzet[v.y] += t; 
+                        if(v.p === 'Ercan' || v.p === 'Efe') {
+                            pOzet[v.p].t += t;
+                            if(v.y === 'Nakit') pOzet[v.p].n += t;
+                            if(v.y === 'Kart') pOzet[v.p].k += t;
+                            if(v.y === 'Iban') pOzet[v.p].i += t;
+                        } else if(pOzet.hasOwnProperty(v.p)) {
+                            pOzet[v.p] += t;
+                        }
+                    }
                 });
             }
-            const eP = Math.floor(pOzet.Ercan * 0.5); const fP = Math.floor(pOzet.Efe * 0.3);
+            const eP = Math.floor(pOzet.Ercan.t * 0.5); const fP = Math.floor(pOzet.Efe.t * 0.3);
             hesaplanmisNet = Math.floor(tC - (eP + fP + gT));
+            
             document.getElementById('yNakit').innerText = yOzet.Nakit; document.getElementById('yKart').innerText = yOzet.Kart; document.getElementById('yIban').innerText = yOzet.Iban;
-            document.getElementById('eToplamIs').innerText = pOzet.Ercan; document.getElementById('pErcan').innerText = eP;
-            document.getElementById('fToplamIs').innerText = pOzet.Efe; document.getElementById('fPay').innerText = fP;
+            
+            document.getElementById('eToplamIs').innerText = pOzet.Ercan.t; document.getElementById('pErcan').innerText = eP;
+            document.getElementById('eN').innerText = pOzet.Ercan.n; document.getElementById('eK').innerText = pOzet.Ercan.k; document.getElementById('eI').innerText = pOzet.Ercan.i;
+            
+            document.getElementById('fToplamIs').innerText = pOzet.Efe.t; document.getElementById('fPay').innerText = fP;
+            document.getElementById('fN').innerText = pOzet.Efe.n; document.getElementById('fK').innerText = pOzet.Efe.k; document.getElementById('fI').innerText = pOzet.Efe.i;
+            
             document.getElementById('cToplam').innerText = tC + " ₺"; document.getElementById('gToplam').innerText = gT + " ₺";
             document.getElementById('netKalan').innerText = hesaplanmisNet + " ₺";
         });
