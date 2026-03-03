@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ahmet Tekeli KASA - V26 Arşivli</title>
+    <title>Ahmet Tekeli KASA - V27 Arşivli</title>
     
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
@@ -19,7 +19,7 @@
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .p-btn { transition: all 0.2s; border: 2px solid transparent; background-color: #f8fafc; color: #64748b; }
         .active-p { border-color: #2563eb !important; background-color: #eff6ff !important; color: #1e40af !important; font-weight: 900 !important; }
-        .islem-row:nth-child(even) { background-color: #f9fafb; }
+        .islem-row:nth-child(even) { background-color: #f8fafc; }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-icerik { background: white; width: 100%; max-width: 400px; border-radius: 2rem; padding: 20px; max-height: 90vh; overflow-y: auto; }
         @media print { .no-print { display: none !important; } .modal-overlay { position: relative; background: white; display: block !important; padding: 0; } .modal-icerik { max-width: 100%; width: 100%; border: none; box-shadow: none; } }
@@ -33,7 +33,7 @@
                 <h2 id="pTakipIsim" class="font-black uppercase text-blue-800 italic text-sm">PERSONEL PANELİ</h2>
                 <button onclick="document.getElementById('personelTakipModal').style.display='none'" class="text-red-500 font-black px-2 py-1 rounded-lg uppercase">Kapat</button>
             </div>
-            <div id="pTakipOzet" class="grid grid-cols-3 gap-2 mb-4 text-center text-[9px]">
+            <div id="pTakipOzet" class="grid grid-cols-3 gap-2 mb-4 text-center text-[10px]">
                 <div class="bg-blue-50 p-2 rounded-lg font-black text-blue-700">NAKİT<br><span id="ptNakit">0</span></div>
                 <div class="bg-orange-50 p-2 rounded-lg font-black text-orange-700">KART<br><span id="ptKart">0</span></div>
                 <div class="bg-purple-50 p-2 rounded-lg font-black text-purple-700">IBAN<br><span id="ptIban">0</span></div>
@@ -78,52 +78,52 @@
                 <input type="number" id="t" placeholder="₺" class="w-1/2 p-2.5 rounded-xl border-none font-black outline-none text-blue-600 text-base">
             </div>
             <div class="flex gap-2">
-                <select id="y" class="w-full p-2.5 rounded-xl bg-white font-black outline-none border border-gray-200 text-[9px]">
+                <select id="y" class="w-full p-2.5 rounded-xl bg-white font-black outline-none border border-gray-200 text-[10px]">
                     <option value="Nakit">NAKİT</option><option value="Kart">KART</option><option value="Iban">IBAN</option>
                 </select>
-                <button onclick="kaydet()" id="kayitBtn" class="bg-slate-800 text-white px-6 rounded-xl font-bold uppercase active:scale-95 text-[9px]">KAYDET</button>
+                <button onclick="kaydet()" id="kayitBtn" class="bg-slate-800 text-white px-6 rounded-xl font-bold uppercase active:scale-95 text-[10px]">KAYDET</button>
             </div>
         </div>
 
-        <div class="flex-grow bg-slate-50 rounded-xl border border-slate-200 overflow-hidden mb-2 flex flex-col min-h-[80px]">
-            <div class="overflow-y-auto max-h-32 flex-grow text-[8px]" id="islemListesi"></div>
+        <div class="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden mb-2 flex flex-col h-32 shadow-sm">
+            <div class="overflow-y-auto flex-grow text-[11px]" id="islemListesi"></div>
         </div>
 
-        <div class="grid grid-cols-3 gap-1.5 mb-2 text-center text-[9px] font-black uppercase italic">
-            <div class="bg-blue-50 p-2 rounded-lg border border-blue-200 shadow-sm text-blue-700">NAKİT: <span id="yNakit" class="text-[10px]">0</span></div>
-            <div class="bg-orange-50 p-2 rounded-lg border border-orange-200 shadow-sm text-orange-700">KART: <span id="yKart" class="text-[10px]">0</span></div>
-            <div class="bg-purple-50 p-2 rounded-lg border border-purple-200 shadow-sm text-purple-700">IBAN: <span id="yIban" class="text-[10px]">0</span></div>
+        <div class="grid grid-cols-3 gap-1 mb-2 text-center text-[10px] font-black uppercase italic">
+            <div class="bg-blue-50 p-2.5 rounded-xl border-2 border-blue-100 shadow-sm text-blue-700">NAKİT<br><span id="yNakit" class="text-xs">0</span></div>
+            <div class="bg-orange-50 p-2.5 rounded-xl border-2 border-orange-100 shadow-sm text-orange-700">KART<br><span id="yKart" class="text-xs">0</span></div>
+            <div class="bg-purple-50 p-2.5 rounded-xl border-2 border-purple-100 shadow-sm text-purple-700">IBAN<br><span id="yIban" class="text-xs">0</span></div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 mb-2 text-[8px]">
-            <div class="bg-orange-50 p-2.5 rounded-xl border border-orange-300 text-center shadow-sm" onclick="pPanelAc('Ercan')">
-                <p class="font-black text-orange-700 uppercase border-b border-orange-200 mb-1 text-[9px]">ERCAN (%50)</p>
-                <div class="font-bold text-slate-700 uppercase">İŞ: <span id="eToplamIs" class="text-orange-700 font-black">0</span> | PAY: <span id="pErcan" class="text-orange-700 font-black">0</span></div>
+        <div class="grid grid-cols-2 gap-2 mb-2">
+            <div class="bg-orange-50 p-3 rounded-2xl border-2 border-orange-200 text-center shadow-sm" onclick="pPanelAc('Ercan')">
+                <p class="font-black text-orange-800 uppercase border-b border-orange-200 mb-1 text-[11px]">ERCAN (%50)</p>
+                <div class="font-black text-slate-800 text-[10px]">İŞ: <span id="eToplamIs">0</span> | PAY: <span id="pErcan">0</span></div>
             </div>
-            <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-300 text-center shadow-sm" onclick="pPanelAc('Efe')">
-                <p class="font-black text-purple-700 uppercase border-b border-purple-200 mb-1 text-[9px]">EFE (%30)</p>
-                <div class="font-bold text-slate-700 uppercase">İŞ: <span id="fToplamIs" class="text-purple-700 font-black">0</span> | PAY: <span id="fPay" class="text-purple-700 font-black">0</span></div>
+            <div class="bg-purple-50 p-3 rounded-2xl border-2 border-purple-200 text-center shadow-sm" onclick="pPanelAc('Efe')">
+                <p class="font-black text-purple-800 uppercase border-b border-purple-200 mb-1 text-[11px]">EFE (%30)</p>
+                <div class="font-black text-slate-800 text-[10px]">İŞ: <span id="fToplamIs">0</span> | PAY: <span id="fPay">0</span></div>
             </div>
         </div>
 
         <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-xl mb-2">
             <div class="flex justify-between items-center mb-0.5">
-                <p class="text-[8px] font-bold text-slate-400 uppercase italic">Günlük Net Kâr</p>
-                <p id="netKalan" class="text-xl font-black text-emerald-400">0 ₺</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase italic">Günlük Net Kâr</p>
+                <p id="netKalan" class="text-2xl font-black text-emerald-400">0 ₺</p>
             </div>
-            <div class="flex justify-between text-[7px] font-bold text-slate-400 border-t border-white/10 pt-1">
+            <div class="flex justify-between text-[8px] font-bold text-slate-400 border-t border-white/10 pt-1">
                 <span>CİRO: <span id="cToplam">0₺</span></span><span>GİDER: <span id="gToplam">0₺</span></span>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-            <button onclick="kasaSifirla()" class="py-2.5 bg-emerald-600 text-white text-[9px] font-black rounded-xl uppercase active:scale-95 shadow-md italic">GÜNÜ KAPAT</button>
-            <button onclick="aySifirla()" class="py-2.5 bg-red-600 text-white text-[9px] font-black rounded-xl uppercase active:scale-95 shadow-md italic">AYI SIFIRLA</button>
+            <button onclick="kasaSifirla()" class="py-3 bg-emerald-600 text-white text-[10px] font-black rounded-xl uppercase active:scale-95 shadow-md italic">GÜNÜ KAPAT</button>
+            <button onclick="aySifirla()" class="py-3 bg-red-600 text-white text-[10px] font-black rounded-xl uppercase active:scale-95 shadow-md italic">AYI SIFIRLA</button>
         </div>
 
-        <div onclick="raporUret()" class="mt-2 bg-blue-600 text-white py-1.5 rounded-xl text-center shadow-md cursor-pointer border-2 border-blue-400">
-            <h2 id="aylikCiro" class="text-sm font-black italic">0 ₺</h2>
-            <p class="text-[6px] font-bold uppercase opacity-80 mt-0.5 tracking-tighter italic">DETAYLI ARŞİV VE RAPORLARI GÖR</p>
+        <div onclick="raporUret()" class="mt-2 bg-blue-600 text-white py-2 rounded-xl text-center shadow-md cursor-pointer border-2 border-blue-400">
+            <h2 id="aylikCiro" class="text-base font-black italic">0 ₺</h2>
+            <p class="text-[7px] font-bold uppercase opacity-80 mt-0.5 tracking-tighter italic">DETAYLI ARŞİV VE RAPORLARI GÖR</p>
         </div>
     </div>
 
@@ -155,17 +155,17 @@
                 if(v.p === isim) {
                     const t = parseFloat(v.t);
                     if(v.y === 'Nakit') pData.n += t; if(v.y === 'Kart') pData.k += t; if(v.y === 'Iban') pData.i += t;
-                    pData.liste += `<div class="flex justify-between border-b py-1 text-[8px]"><span>${v.saat} | ${v.h}</span><span class="font-bold">${t} ₺ (${v.y[0]})</span></div>`;
+                    pData.liste += `<div class="flex justify-between border-b py-1.5 text-[10px]"><span>${v.saat} | ${v.h}</span><span class="font-bold">${t} ₺ (${v.y[0]})</span></div>`;
                 }
             });
             document.getElementById('pTakipIsim').innerText = isim + " PANELİ";
             document.getElementById('ptNakit').innerText = pData.n; document.getElementById('ptKart').innerText = pData.k; document.getElementById('ptIban').innerText = pData.i;
-            document.getElementById('pTakipListe').innerHTML = pData.liste || "<p class='text-center opacity-50 py-4'>İşlem yok</p>";
+            document.getElementById('pTakipListe').innerHTML = pData.liste || "<p class='text-center opacity-50 py-4 font-bold'>İşlem yok</p>";
             document.getElementById('personelTakipModal').style.display = 'flex';
         }
 
         function veresiyeEkle() { const m = document.getElementById('vMusteri').value; const t = parseFloat(document.getElementById('vTutar').value); if(!m || isNaN(t)) return; db.ref('veresiye/').push({ m, t, tarih: new Date().toLocaleDateString('tr-TR') }); document.getElementById('vMusteri').value = ''; document.getElementById('vTutar').value = ''; }
-        function veresiyeListele() { const ara = document.getElementById('vAra').value.toLowerCase(); db.ref('veresiye/').on('value', (snap) => { const liste = document.getElementById('veresiyeListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.m.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-slate-50 border rounded-lg mb-1"><span class="font-black text-blue-900 uppercase">${v.m}</span><div class="flex items-center gap-2"><span class="font-black text-blue-600">${v.t} ₺</span><button onclick="veresiyeTahsilEt('${key}', '${v.m}', ${v.t})" class="bg-emerald-500 text-white px-2 py-1 rounded text-[8px] font-bold uppercase">ALINDI</button></div></div>`; } }); } }); }
+        function veresiyeListele() { const ara = document.getElementById('vAra').value.toLowerCase(); db.ref('veresiye/').on('value', (snap) => { const liste = document.getElementById('veresiyeListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.m.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-slate-50 border rounded-lg mb-1"><span class="font-black text-blue-900 uppercase">${v.m}</span><div class="flex items-center gap-2"><span class="font-black text-blue-600">${v.t} ₺</span><button onclick="veresiyeTahsilEt('${key}', '${v.m}', ${v.t})" class="bg-emerald-500 text-white px-2 py-1 rounded text-[9px] font-bold uppercase">ALINDI</button></div></div>`; } }); } }); }
         function veresiyeTahsilEt(id, musteri, tutar) { if(confirm(musteri + " tahsil edildi mi?")) { db.ref('kasa/').push({ h: musteri + " (Veresiye)", t: tutar, y: 'Nakit', p: 'ahmet', saat: 'Tahsilat' }); db.ref('veresiye/' + id).remove(); } }
         function giderPanelEkle() { const ad = document.getElementById('gAd').value; const t = parseFloat(document.getElementById('gTutar').value); if(!ad || isNaN(t)) return; db.ref('kasa/').push({ h: ad, t: t, y: 'Nakit', p: 'Gider', saat: 'Masraf' }); db.ref('aylikGider/' + ayID).push({ ad, t, tarih: gunID }); document.getElementById('gAd').value = ''; document.getElementById('gTutar').value = ''; }
         function giderPanelListele() { const ara = document.getElementById('gAra').value.toLowerCase(); db.ref('kasa/').on('value', (snap) => { const liste = document.getElementById('giderPanelListesi'); liste.innerHTML = ""; if(snap.val()) { Object.keys(snap.val()).forEach(key => { const v = snap.val()[key]; if(v.p === 'Gider' && v.h.toLowerCase().includes(ara)) { liste.innerHTML += `<div class="flex justify-between items-center p-2 bg-red-50 border border-red-100 rounded-lg mb-1"><span><b>${v.h.toUpperCase()}</b></span><span class="font-black text-red-600">${v.t} ₺</span></div>`; } }); } }); }
@@ -180,7 +180,7 @@
             if (veriler) {
                 Object.keys(veriler).reverse().forEach(key => {
                     const v = veriler[key]; const t = parseFloat(v.t);
-                    listDiv.innerHTML += `<div class="islem-row flex justify-between items-center p-1.5 border-b"><span><b>${v.p}:</b> ${v.h}</span><div class="flex items-center gap-2"><span class="font-black">${t} ₺</span><button onclick="kayitSil('${key}')" class="text-red-300 px-1"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
+                    listDiv.innerHTML += `<div class="islem-row flex justify-between items-center p-2 border-b"><span><b class="uppercase">${v.p}:</b> ${v.h}</span><div class="flex items-center gap-2"><span class="font-black text-slate-900">${t} ₺</span><button onclick="kayitSil('${key}')" class="text-red-400 px-1"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
                     if (v.p === 'Gider') { gT += t; } 
                     else { tC += t; if(yOzet[v.y] !== undefined) yOzet[v.y] += t; if(pOzet.hasOwnProperty(v.p)) pOzet[v.p] += t; }
                 });
@@ -212,7 +212,7 @@
                 personeller.forEach(p => raporGruplari[p] = { liste: "", toplam: 0 });
                 Object.values(veri).forEach(v => {
                     const t = parseFloat(v.t);
-                    let satir = `<div class="flex justify-between border-b border-gray-50 py-1 text-[7px]"><span>${v.saat} | ${v.h} (${v.y[0]})</span><span class="font-bold">${t} ₺</span></div>`;
+                    let satir = `<div class="flex justify-between border-b border-gray-50 py-1 text-[8px]"><span>${v.saat} | ${v.h} (${v.y[0]})</span><span class="font-bold">${t} ₺</span></div>`;
                     if(raporGruplari[v.p]) { raporGruplari[v.p].liste += satir; raporGruplari[v.p].toplam += t; }
                 });
                 personeller.forEach(p => {
