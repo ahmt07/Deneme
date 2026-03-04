@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ahmet Tekeli KASA - V34 Maaş Fix</title>
+    <title>Ahmet Tekeli KASA - V35 Tam Düzenleme</title>
     
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
@@ -37,12 +37,40 @@
         </div>
     </div>
 
-    <div id="veresiyeModal" class="modal-overlay"><div class="modal-icerik shadow-2xl border border-slate-200 text-[9px]"><div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="font-black uppercase text-blue-800">VERESİYE DEFTERİ</h2><button onclick="document.getElementById('veresiyeModal').style.display='none'" class="text-red-500 font-black">KAPAT</button></div><div class="bg-slate-100 p-3 rounded-xl mb-3"><input type="text" id="vMusteri" placeholder="Müşteri Adı" class="w-full p-2 mb-2 rounded-lg border-none"><div class="flex gap-1"><input type="number" id="vTutar" placeholder="₺ Borç" class="w-1/2 p-2 rounded-lg border-none"><button onclick="veresiyeEkle()" class="w-1/2 bg-blue-600 text-white rounded-lg font-bold">EKLE</button></div></div><div id="veresiyeListesi" class="space-y-2"></div></div></div>
-    <div id="giderModal" class="modal-overlay"><div class="modal-icerik shadow-2xl border border-slate-200 text-[9px]"><div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="font-black uppercase text-red-800">DÜKKAN GİDERLERİ</h2><button onclick="document.getElementById('giderModal').style.display='none'" class="text-red-500 font-black">KAPAT</button></div><div class="bg-red-50 p-3 rounded-xl mb-3"><input type="text" id="gAd" placeholder="Gider Adı" class="w-full p-2 mb-2 rounded-lg border-none"><div class="flex gap-1"><input type="number" id="gTutar" placeholder="₺ Tutar" class="w-1/2 p-2 rounded-lg border-none"><button onclick="giderPanelEkle()" class="w-1/2 bg-red-600 text-white rounded-lg font-bold">KAYDET</button></div></div><div id="giderPanelListesi" class="space-y-2"></div></div></div>
-    <div id="raporModal" class="modal-overlay"><div class="modal-icerik shadow-2xl border border-slate-200"><div id="raporData" class="space-y-4 text-[9px]"></div><button onclick="document.getElementById('raporModal').style.display='none'" class="w-full mt-4 bg-slate-800 text-white py-2 rounded-xl">KAPAT</button></div></div>
+    <div id="veresiyeModal" class="modal-overlay"><div class="modal-icerik shadow-2xl border border-slate-200"><div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="font-black uppercase text-blue-800">VERESİYE DEFTERİ</h2><button onclick="document.getElementById('veresiyeModal').style.display='none'" class="text-red-500 font-black">Kapat</button></div><div id="veresiyeListesi" class="space-y-2"></div></div></div>
+    
+    <div id="giderModal" class="modal-overlay">
+        <div class="modal-icerik shadow-2xl border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="font-black uppercase text-red-800">GİDERLER VE MAAŞLAR</h2>
+                <button onclick="document.getElementById('giderModal').style.display='none'" class="text-red-500 font-black">Kapat</button>
+            </div>
+            <div class="bg-red-50 p-3 rounded-xl mb-3">
+                <input type="text" id="gAd" placeholder="Gider Adı (Örn: Kira, Fatura)" class="w-full p-2 mb-2 rounded-lg border-none">
+                <div class="flex gap-1">
+                    <input type="number" id="gTutar" placeholder="₺ Tutar" class="w-1/2 p-2 rounded-lg border-none">
+                    <button onclick="giderPanelEkle()" class="w-1/2 bg-red-600 text-white rounded-lg font-bold uppercase text-[9px]">Gider Ekle</button>
+                </div>
+            </div>
+            <div id="giderPanelListesi" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <div id="raporModal" class="modal-overlay">
+        <div class="modal-icerik shadow-2xl border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="font-black text-blue-800 italic uppercase">Arşiv & Rapor</h2>
+                <button onclick="document.getElementById('raporModal').style.display='none'" class="text-red-500 font-black">KAPAT</button>
+            </div>
+            <div class="mb-4">
+                <input type="date" id="arsivTarih" onchange="arsivGetir(this.value)" class="w-full p-2 bg-slate-100 rounded-lg font-bold">
+            </div>
+            <div id="raporData" class="space-y-4"></div>
+        </div>
+    </div>
 
     <div class="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-2xl p-4 min-h-[95vh] flex flex-col border border-slate-100">
-        <div class="flex justify-between items-center mb-3 px-1">
+        <div class="flex justify-between items-center mb-4 px-1">
             <button onclick="document.getElementById('veresiyeModal').style.display='flex'" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full font-black text-[8px] uppercase italic">VERESİYE</button>
             <div class="text-center">
                 <h1 class="text-lg font-black text-slate-900 tracking-tighter uppercase italic">AHMET TEKELİ KASA</h1>
@@ -55,9 +83,15 @@
             <button onclick="pSec('ahmet')" ondblclick="pPanelAc('ahmet')" id="btnahmet" class="p-btn active-p p-3 rounded-2xl font-black uppercase flex flex-col items-center gap-1"><i class="fa-solid fa-user-tie text-blue-600"></i><span>AHMET</span></button>
             <button onclick="pSec('Ercan')" ondblclick="pPanelAc('Ercan')" id="btnErcan" class="p-btn p-3 rounded-2xl font-black uppercase text-orange-600 flex flex-col items-center gap-1"><i class="fa-solid fa-scissors text-orange-500"></i><span>ERCAN</span></button>
             <button onclick="pSec('Efe')" ondblclick="pPanelAc('Efe')" id="btnEfe" class="p-btn p-3 rounded-2xl font-black uppercase text-purple-600 flex flex-col items-center gap-1"><i class="fa-solid fa-scissors text-purple-500"></i><span>EFE</span></button>
-            <button onclick="pSec('Turancan')" ondblclick="pPanelAc('Turancan')" id="btnTurancan" class="p-btn p-2 rounded-xl font-bold uppercase">TURANCAN</button>
-            <button onclick="pSec('Bekir')" ondblclick="pPanelAc('Bekir')" id="btnBekir" class="p-btn p-2 rounded-xl font-bold uppercase">BEKİR</button>
-            <button onclick="pSec('Gider')" id="btnGider" class="p-btn bg-red-50 text-red-600 p-2 rounded-xl font-bold uppercase">GİDER</button>
+            <button onclick="pSec('Turancan')" ondblclick="pPanelAc('Turancan')" id="btnTurancan" class="p-btn p-3 rounded-xl font-bold uppercase col-span-1">TURANCAN</button>
+            <button onclick="pSec('Bekir')" ondblclick="pPanelAc('Bekir')" id="btnBekir" class="p-btn p-3 rounded-xl font-bold uppercase col-span-2 text-center">BEKİR</button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-1.5 mb-3">
+            <button onclick="hizliDoldur('Saç', 500)" class="bg-white border py-3 rounded-xl font-bold">SAÇ</button>
+            <button onclick="hizliDoldur('Sakal', 250)" class="bg-white border py-3 rounded-xl font-bold">SAKAL</button>
+            <button onclick="hizliDoldur('Çocuk Saç', 450)" class="bg-white border py-3 rounded-xl font-bold">ÇOCUK</button>
+            <button onclick="hizliDoldur('Saç Sakal', 700)" class="bg-blue-50 border-blue-200 border py-3 rounded-xl font-black text-blue-700">S+S</button>
         </div>
 
         <div class="bg-slate-100 p-4 rounded-3xl mb-4 shadow-inner border border-slate-200">
@@ -83,12 +117,10 @@
             <div class="bg-orange-50 p-4 rounded-3xl border-2 border-orange-200 text-center shadow-sm" onclick="pPanelAc('Ercan')">
                 <p class="font-black text-orange-800 uppercase border-b border-orange-200 mb-2 text-xs italic">ERCAN (%50)</p>
                 <div class="font-black text-slate-800 text-xs mb-1">İŞ: <span id="eToplamIs">0</span> | PAY: <span id="pErcan">0</span></div>
-                <div class="text-[9px] font-bold text-slate-500">N:<span id="eN">0</span> K:<span id="eK">0</span> I:<span id="eI">0</span></div>
             </div>
             <div class="bg-purple-50 p-4 rounded-3xl border-2 border-purple-200 text-center shadow-sm" onclick="pPanelAc('Efe')">
                 <p class="font-black text-purple-800 uppercase border-b border-purple-200 mb-2 text-xs italic">EFE (%30)</p>
                 <div class="font-black text-slate-800 text-xs mb-1">İŞ: <span id="fToplamIs">0</span> | PAY: <span id="fPay">0</span></div>
-                <div class="text-[9px] font-bold text-slate-500">N:<span id="fN">0</span> K:<span id="fK">0</span> I:<span id="fI">0</span></div>
             </div>
         </div>
 
@@ -124,10 +156,14 @@
         document.getElementById('bugunTarih').innerText = simdi.toLocaleDateString('tr-TR', { day:'2-digit', month:'long', year:'numeric' });
 
         function pSec(sec) { p = sec; document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active-p')); document.getElementById('btn' + sec).classList.add('active-p'); }
+        function hizliDoldur(is, f) { document.getElementById('h').value = is; document.getElementById('t').value = f; }
+        
         function kaydet() {
             const h = document.getElementById('h').value; const t = parseFloat(document.getElementById('t').value); const y = document.getElementById('y').value;
             if(!h || isNaN(t)) return;
-            db.ref('kasa/').push({ h, t, y, p, saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}) });
+            // Eğer açıklama Maaş veya Avans içeriyorsa personeli "Gider" olarak da işaretle
+            const isMaas = h.toLowerCase().includes('maa') || h.toLowerCase().includes('avan');
+            db.ref('kasa/').push({ h, t, y, p, saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}), maasMi: isMaas });
             document.getElementById('h').value = ''; document.getElementById('t').value = '';
         }
 
@@ -135,77 +171,87 @@
             if(!sonKasaVerisi) return;
             let pData = { n:0, k:0, i:0, odeme:0, liste: "" };
             const maasli = (isim === 'Turancan' || isim === 'Bekir');
-            Object.keys(sonKasaVerisi).forEach(key => {
-                const v = sonKasaVerisi[key];
+            Object.keys(sonKasaVerisi).forEach(k => {
+                const v = sonKasaVerisi[k];
                 if(v.p === isim) {
                     const t = parseFloat(v.t);
-                    const aciklama = v.h.toLowerCase();
                     if(maasli) {
-                        // "Maaş" veya "Avans" kelimesi geçiyorsa veya direkt personeli kontrol ediyorsak göster
-                        if(aciklama.includes('maa') || aciklama.includes('avan')) {
-                            pData.odeme += t;
-                            pData.liste += `<div class="flex justify-between items-center border-b py-3 text-[11px] font-bold"><span>${v.saat} | ${v.h}</span><div class="flex items-center gap-3"><span>${t} ₺</span><button onclick="kayitSil('${key}')" class="text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
-                        }
+                        if(v.maasMi) { pData.odeme += t; pData.liste += listeSatiri(v, t, k); }
                     } else {
                         if(v.y === 'Nakit') pData.n += t; if(v.y === 'Kart') pData.k += t; if(v.y === 'Iban') pData.i += t;
-                        pData.liste += `<div class="flex justify-between items-center border-b py-3 text-[11px] font-bold"><span>${v.saat} | ${v.h} (${v.y[0]})</span><div class="flex items-center gap-3"><span>${t} ₺</span><button onclick="kayitSil('${key}')" class="text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
+                        pData.liste += listeSatiri(v, t, k);
                     }
                 }
             });
             document.getElementById('pTakipIsim').innerText = isim + " PANELİ";
-            document.getElementById('pTakipOzet').innerHTML = maasli ? `<div class="bg-emerald-50 p-2 rounded-lg font-black text-emerald-700 text-center">TOPLAM ÖDEME: ${pData.odeme} ₺</div>` : `<div class="grid grid-cols-3 gap-2 text-center text-[10px] font-black"><div class="bg-blue-50 p-2 rounded-lg text-blue-700">N:${pData.n}</div><div class="bg-orange-50 p-2 rounded-lg text-orange-700">K:${pData.k}</div><div class="bg-purple-50 p-2 rounded-lg text-purple-700">I:${pData.i}</div></div>`;
-            document.getElementById('pTakipListe').innerHTML = pData.liste || "<p class='text-center py-5 opacity-50 font-bold'>Kayıt bulunamadı.</p>";
+            document.getElementById('pTakipOzet').innerHTML = maasli ? `<div class="bg-emerald-50 p-2 rounded-lg font-black text-emerald-700 text-center">MAAŞ/AVANS: ${pData.odeme} ₺</div>` : `<div class="grid grid-cols-3 gap-2 text-center font-black"><div class="bg-blue-50 p-1 rounded">N:${pData.n}</div><div class="bg-orange-50 p-1 rounded">K:${pData.k}</div><div class="bg-purple-50 p-1 rounded">I:${pData.i}</div></div>`;
+            document.getElementById('pTakipListe').innerHTML = pData.liste || "<p class='text-center py-5 opacity-50'>Kayıt yok.</p>";
             document.getElementById('personelTakipModal').style.display = 'flex';
         }
 
+        function listeSatiri(v, t, k) { return `<div class="flex justify-between items-center border-b py-3 font-bold"><span>${v.saat} | ${v.h}</span><div class="flex items-center gap-3"><span>${t} ₺</span><button onclick="kayitSil('${k}')" class="text-red-500 p-1"><i class="fa-solid fa-trash-can"></i></button></div></div>`; }
         function kayitSil(id) { if(confirm("Sileyim mi abi?")) { db.ref('kasa/' + id).remove(); document.getElementById('personelTakipModal').style.display = 'none'; } }
 
-        db.ref('kasa/').on('value', (snapshot) => {
-            const veriler = snapshot.val(); sonKasaVerisi = veriler;
-            let tC=0, gT=0; let yOzet = { Nakit:0, Kart:0, Iban:0 };
-            let pOzet = { Ercan: { t:0, n:0, k:0, i:0 }, Efe: { t:0, n:0, k:0, i:0 }, ahmet: 0, Turancan: 0, Bekir: 0 };
+        function giderPanelEkle() {
+            const a = document.getElementById('gAd').value; const t = parseFloat(document.getElementById('gTutar').value);
+            if(!a || isNaN(t)) return;
+            db.ref('kasa/').push({ h: a, t, y: 'Nakit', p: 'Gider', saat: 'Masraf' });
+            document.getElementById('gAd').value = ''; document.getElementById('gTutar').value = '';
+        }
+
+        db.ref('kasa/').on('value', (snap) => {
+            const veriler = snap.val(); sonKasaVerisi = veriler;
+            let tC=0, gT=0, yOzet = { Nakit:0, Kart:0, Iban:0 };
+            let pOzet = { Ercan: 0, Efe: 0 };
+            const gListe = document.getElementById('giderPanelListesi'); gListe.innerHTML = "";
+
             if (veriler) {
-                Object.keys(veriler).forEach(key => {
-                    const v = veriler[key]; const t = parseFloat(v.t);
-                    if (v.p === 'Gider') { gT += t; } 
-                    else { 
-                        tC += t; if(yOzet[v.y] !== undefined) yOzet[v.y] += t; 
-                        if(v.p === 'Ercan' || v.p === 'Efe') { pOzet[v.p].t += t; if(v.y === 'Nakit') pOzet[v.p].n += t; if(v.y === 'Kart') pOzet[v.p].k += t; if(v.y === 'Iban') pOzet[v.p].i += t; } 
-                        else if(pOzet.hasOwnProperty(v.p)) { pOzet[v.p] += t; } 
+                Object.keys(veriler).forEach(k => {
+                    const v = veriler[k]; const t = parseFloat(v.t);
+                    if (v.p === 'Gider' || v.maasMi) { 
+                        gT += t; 
+                        const gIsim = v.maasMi ? `${v.p} (${v.h})` : v.h;
+                        gListe.innerHTML += `<div class="flex justify-between bg-white p-2 rounded-lg border mb-1"><b>${gIsim}</b><span>${t} ₺ <button onclick="kayitSil('${k}')" class="text-red-500 ml-1 font-bold">X</button></span></div>`;
+                    } else { 
+                        tC += t; yOzet[v.y] += t;
+                        if(v.p === 'Ercan') pOzet.Ercan += t; if(v.p === 'Efe') pOzet.Efe += t;
                     }
                 });
             }
-            const eP = Math.floor(pOzet.Ercan.t * 0.5); const fP = Math.floor(pOzet.Efe.t * 0.3);
+            const eP = Math.floor(pOzet.Ercan * 0.5); const fP = Math.floor(pOzet.Efe * 0.3);
             hesaplanmisNet = Math.floor(tC - (eP + fP + gT));
             document.getElementById('yNakit').innerText = yOzet.Nakit; document.getElementById('yKart').innerText = yOzet.Kart; document.getElementById('yIban').innerText = yOzet.Iban;
-            document.getElementById('eToplamIs').innerText = pOzet.Ercan.t; document.getElementById('pErcan').innerText = eP;
-            document.getElementById('eN').innerText = pOzet.Ercan.n; document.getElementById('eK').innerText = pOzet.Ercan.k; document.getElementById('eI').innerText = pOzet.Ercan.i;
-            document.getElementById('fToplamIs').innerText = pOzet.Efe.t; document.getElementById('fPay').innerText = fP;
-            document.getElementById('fN').innerText = pOzet.Efe.n; document.getElementById('fK').innerText = pOzet.Efe.k; document.getElementById('fI').innerText = pOzet.Efe.i;
+            document.getElementById('eToplamIs').innerText = pOzet.Ercan; document.getElementById('pErcan').innerText = eP;
+            document.getElementById('fToplamIs').innerText = pOzet.Efe; document.getElementById('fPay').innerText = fP;
             document.getElementById('cToplam').innerText = tC + " ₺"; document.getElementById('gToplam').innerText = gT + " ₺";
             document.getElementById('netKalan').innerText = hesaplanmisNet + " ₺";
         });
 
-        function raporUret() {
-            let html = `<h2 class="font-black text-center mb-4 border-b pb-2">GÜNLÜK DETAYLAR</h2>`;
-            if(!sonKasaVerisi) html += "<p class='text-center py-5 opacity-50'>Veri yok.</p>";
+        async function arsivGetir(t) {
+            let v; if(t === gunID) v = sonKasaVerisi; else { const s = await db.ref('arsiv/' + t).once('value'); v = s.val(); }
+            raporOlustur(v, t);
+        }
+        function raporUret() { document.getElementById('arsivTarih').value = gunID; arsivGetir(gunID); }
+        function raporOlustur(v, t) {
+            let html = `<div class="text-center font-black border-b pb-2 mb-4 italic uppercase">${t} RAPORU</div>`;
+            if(!v) html += "<p class='text-center opacity-50 py-5'>Kayıt yok.</p>";
             else {
-                Object.keys(sonKasaVerisi).forEach(key => {
-                    const v = sonKasaVerisi[key];
-                    html += `<div class="flex justify-between border-b py-1 mb-1"><span><b>${v.p.toUpperCase()}:</b> ${v.h}</span><span>${v.t} ₺</span></div>`;
+                let gruplar = {};
+                Object.values(v).forEach(x => {
+                    if(!gruplar[x.p]) gruplar[x.p] = { t: 0, l: "" };
+                    gruplar[x.p].t += parseFloat(x.t);
+                    gruplar[x.p].l += `<div class="flex justify-between border-b py-1 text-[8px]"><span>${x.saat} | ${x.h}</span><span>${x.t} ₺</span></div>`;
+                });
+                Object.keys(gruplar).forEach(per => {
+                    html += `<div class="mb-3 border rounded-xl overflow-hidden"><div class="bg-slate-100 p-2 flex justify-between font-black uppercase italic"><span>${per}</span><span>${gruplar[per].t} ₺</span></div><div class="p-2">${gruplar[per].l}</div></div>`;
                 });
             }
-            document.getElementById('raporData').innerHTML = html;
-            document.getElementById('raporModal').style.display = 'flex';
+            document.getElementById('raporData').innerHTML = html; document.getElementById('raporModal').style.display = 'flex';
         }
 
-        db.ref('aylikNet/' + ayID).on('value', (snap) => { document.getElementById('aylikCiro').innerText = (snap.val() || 0).toLocaleString('tr-TR') + " ₺"; });
+        db.ref('aylikNet/' + ayID).on('value', (s) => { document.getElementById('aylikCiro').innerText = (s.val() || 0).toLocaleString('tr-TR') + " ₺"; });
         function kasaSifirla() { if(confirm("Günü kapatıyorum abi?")) { db.ref('arsiv/' + gunID).set(sonKasaVerisi); db.ref('aylikNet/' + ayID).transaction(c => (c || 0) + hesaplanmisNet); db.ref('kasa/').remove(); } }
         function aySifirla() { if(confirm("Ayı sıfırlıyorum?")) { db.ref('aylikNet/' + ayID).set(0); } }
-        function veresiyeEkle() { const m = document.getElementById('vMusteri').value; const t = parseFloat(document.getElementById('vTutar').value); if(!m || isNaN(t)) return; db.ref('veresiye/').push({ m, t }); document.getElementById('vMusteri').value = ''; document.getElementById('vTutar').value = ''; }
-        db.ref('veresiye/').on('value', (snap) => { const l = document.getElementById('veresiyeListesi'); l.innerHTML = ""; if(snap.val()) Object.keys(snap.val()).forEach(k => { const v = snap.val()[k]; l.innerHTML += `<div class="flex justify-between bg-white p-2 rounded-lg border mb-1"><b>${v.m}</b><span>${v.t} ₺ <button onclick="db.ref('veresiye/${k}').remove()" class="text-red-500 ml-2">X</button></span></div>`; })});
-        function giderPanelEkle() { const a = document.getElementById('gAd').value; const t = parseFloat(document.getElementById('gTutar').value); if(!a || isNaN(t)) return; db.ref('kasa/').push({ h: a, t, y: 'Nakit', p: 'Gider', saat: 'Masraf' }); document.getElementById('gAd').value = ''; document.getElementById('gTutar').value = ''; }
-        db.ref('kasa/').on('value', (snap) => { const l = document.getElementById('giderPanelListesi'); l.innerHTML = ""; if(snap.val()) Object.keys(snap.val()).forEach(k => { const v = snap.val()[k]; if(v.p === 'Gider') l.innerHTML += `<div class="flex justify-between bg-white p-2 rounded-lg border mb-1"><b>${v.h}</b><span>${v.t} ₺ <button onclick="kayitSil('${k}')" class="text-red-500 ml-2">X</button></span></div>`; })});
     </script>
 </body>
 </html>
