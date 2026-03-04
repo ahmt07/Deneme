@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ahmet Tekeli KASA - V35 Tam Düzenleme</title>
+    <title>Ahmet Tekeli KASA - V36 Final</title>
     
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ahmt07/Deneme/main/ikon.png">
@@ -83,8 +83,8 @@
             <button onclick="pSec('ahmet')" ondblclick="pPanelAc('ahmet')" id="btnahmet" class="p-btn active-p p-3 rounded-2xl font-black uppercase flex flex-col items-center gap-1"><i class="fa-solid fa-user-tie text-blue-600"></i><span>AHMET</span></button>
             <button onclick="pSec('Ercan')" ondblclick="pPanelAc('Ercan')" id="btnErcan" class="p-btn p-3 rounded-2xl font-black uppercase text-orange-600 flex flex-col items-center gap-1"><i class="fa-solid fa-scissors text-orange-500"></i><span>ERCAN</span></button>
             <button onclick="pSec('Efe')" ondblclick="pPanelAc('Efe')" id="btnEfe" class="p-btn p-3 rounded-2xl font-black uppercase text-purple-600 flex flex-col items-center gap-1"><i class="fa-solid fa-scissors text-purple-500"></i><span>EFE</span></button>
-            <button onclick="pSec('Turancan')" ondblclick="pPanelAc('Turancan')" id="btnTurancan" class="p-btn p-3 rounded-xl font-bold uppercase col-span-1">TURANCAN</button>
-            <button onclick="pSec('Bekir')" ondblclick="pPanelAc('Bekir')" id="btnBekir" class="p-btn p-3 rounded-xl font-bold uppercase col-span-2 text-center">BEKİR</button>
+            <button onclick="pSec('Turancan')" ondblclick="pPanelAc('Turancan')" id="btnTurancan" class="p-btn p-3 rounded-xl font-black uppercase col-span-1 text-[9px]">TURANCAN</button>
+            <button onclick="pSec('Bekir')" ondblclick="pPanelAc('Bekir')" id="btnBekir" class="p-btn p-3 rounded-xl font-black uppercase col-span-2 text-center text-[9px]">BEKİR</button>
         </div>
 
         <div class="grid grid-cols-4 gap-1.5 mb-3">
@@ -126,11 +126,12 @@
 
         <div class="bg-slate-900 text-white p-4 rounded-3xl shadow-xl mb-4 mt-auto">
             <div class="flex justify-between items-center mb-1">
-                <p class="text-[10px] font-bold text-slate-400 uppercase italic">Günlük Net Kâr</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase italic tracking-wider">GÜNLÜK NET KÂR</p>
                 <p id="netKalan" class="text-3xl font-black text-emerald-400">0 ₺</p>
             </div>
-            <div class="flex justify-between text-[9px] font-bold text-slate-400 border-t border-white/10 pt-2">
-                <span>CİRO: <span id="cToplam">0₺</span></span><span>GİDER: <span id="gToplam">0₺</span></span>
+            <div class="flex justify-between text-[11px] font-black tracking-tight border-t border-white/20 pt-2 uppercase">
+                <span class="text-slate-200">CİRO: <span id="cToplam" class="text-white">0₺</span></span>
+                <span class="text-red-400">GİDER: <span id="gToplam" class="text-red-400">0₺</span></span>
             </div>
         </div>
 
@@ -161,7 +162,6 @@
         function kaydet() {
             const h = document.getElementById('h').value; const t = parseFloat(document.getElementById('t').value); const y = document.getElementById('y').value;
             if(!h || isNaN(t)) return;
-            // Eğer açıklama Maaş veya Avans içeriyorsa personeli "Gider" olarak da işaretle
             const isMaas = h.toLowerCase().includes('maa') || h.toLowerCase().includes('avan');
             db.ref('kasa/').push({ h, t, y, p, saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}), maasMi: isMaas });
             document.getElementById('h').value = ''; document.getElementById('t').value = '';
